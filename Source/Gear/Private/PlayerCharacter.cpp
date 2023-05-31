@@ -5,6 +5,8 @@
 #include "Camera/CameraComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
+
 
 APlayerCharacter::APlayerCharacter()
 {
@@ -18,26 +20,53 @@ APlayerCharacter::APlayerCharacter()
 	// Config camera component setting, so we can make first person camera look
 	CameraComponent->bUsePawnControlRotation = true;
 	CameraComponent->SetRelativeLocation(FVector(-10.f,0.f,60.f));
-	
+
+	bIsSprinting = false;
+	MaxStamina = 100;
+	StaminaDepletionRate = 10.f;
+	StaminaRecoveryRate = 15.f;
+	SprintSpeedModifier = 100.f;
+}
+
+void APlayerCharacter::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+
+	MaxWalkSpeed = GetCharacterMovement()->MaxWalkSpeed;
+	CurrentStamina = MaxStamina;
+	SprintSpeedModifier += GetCharacterMovement()->MaxWalkSpeed;
 }
 
 // Called when the game starts or when spawned
 void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-}
 
-// Called every frame
-void APlayerCharacter::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-	
 	// Add default Input Mapping Context
 	if (const TObjectPtr<APlayerController> PlayerController = Cast<APlayerController>(GetController()))
 	{
 		if (const TObjectPtr<UEnhancedInputLocalPlayerSubsystem> Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 		{
 			Subsystem->AddMappingContext(DefaultMappingContext,0);
+		}
+	}
+}
+
+// Called every frame
+void APlayerCharacter::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	UE_LOG(LogTemp,Display,TEXT("Current Stamina: %f"),CurrentStamina);
+	if (bIsSprinting && CurrentStamina > 0)
+	{
+		CurrentStamina -= StaminaDepletionRate * DeltaTime;
+	}
+	else
+	{
+		if (CurrentStamina < MaxStamina)
+		{
+			CurrentStamina += StaminaRecoveryRate * DeltaTime;
 		}
 	}
 }
@@ -51,6 +80,8 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		EnhancedInputComponent->BindAction(MoveAction,ETriggerEvent::Triggered,this,&APlayerCharacter::Move);
 		EnhancedInputComponent->BindAction(LookAction,ETriggerEvent::Triggered,this,&APlayerCharacter::Look);
 		EnhancedInputComponent->BindAction(JumpAction,ETriggerEvent::Triggered,this,&APlayerCharacter::Jump);
+		EnhancedInputComponent->BindAction(SprintAction,ETriggerEvent::Triggered,this,&APlayerCharacter::OnStartSprint);
+		EnhancedInputComponent->BindAction(SprintAction,ETriggerEvent::Completed,this,&APlayerCharacter::OnEndSprint);
 	}
 
 }
@@ -79,4 +110,21 @@ void APlayerCharacter::Look(const FInputActionValue& Value)
 		// We take Y axis from DirectionalValue, so we can look up/down
 		AddControllerPitchInput(LookAxisValue.Y);
 	}
+}
+
+void APlayerCharacter::OnStartSprint(const FInputActionValue& Value)
+{
+	if (CurrentStamina <= 0)
+	{
+		OnEndSprint(Value);
+		return;
+	}
+	GetCharacterMovement()->MaxWalkSpeed = SprintSpeedModifier;
+	bIsSprinting = true;
+}
+
+void APlayerCharacter::OnEndSprint(const FInputActionValue& Value)
+{
+	GetCharacterMovement()->MaxWalkSpeed = MaxWalkSpeed;
+	bIsSprinting = false;
 }

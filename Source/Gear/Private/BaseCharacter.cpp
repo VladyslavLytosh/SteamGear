@@ -11,6 +11,13 @@ ABaseCharacter::ABaseCharacter()
 
 }
 
+void ABaseCharacter::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+
+	
+}
+
 // Called when the game starts or when spawned
 void ABaseCharacter::BeginPlay()
 {

@@ -19,6 +19,7 @@ public:
 	// Sets default values for this character's properties
 	APlayerCharacter();
 
+	virtual void PostInitializeComponents() override;
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -49,5 +50,21 @@ private:
 
 	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly,Category = "Camera",meta = (AllowPrivateAccess = true))
 	TObjectPtr<class UCameraComponent> CameraComponent;
+
+	void OnStartSprint(const FInputActionValue& Value);
+	void OnEndSprint(const FInputActionValue& Value);
+	
+	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category = "Sprint",meta = (AllowPrivateAccess = true))
+	float SprintSpeedModifier;
+	float MaxWalkSpeed;
+	bool bIsSprinting;
+
+	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category = "Sprint",meta = (AllowPrivateAccess = true))
+	float MaxStamina;
+	float CurrentStamina;
+	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category = "Sprint",meta = (AllowPrivateAccess = true))
+	float StaminaDepletionRate;
+	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category = "Sprint",meta = (AllowPrivateAccess = true))
+	float StaminaRecoveryRate;
 	
 };
