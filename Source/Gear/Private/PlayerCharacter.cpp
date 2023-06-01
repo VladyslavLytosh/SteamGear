@@ -69,6 +69,8 @@ void APlayerCharacter::Tick(float DeltaTime)
 			CurrentStamina += StaminaRecoveryRate * DeltaTime;
 		}
 	}
+
+	
 }
 
 // Called to bind functionality to input
