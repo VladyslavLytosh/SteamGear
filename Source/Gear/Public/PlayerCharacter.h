@@ -51,7 +51,7 @@ private:
 	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly,Category = "Camera",meta = (AllowPrivateAccess = true))
 	TObjectPtr<class UCameraComponent> CameraComponent;
 
-	void OnStartSprint(const FInputActionValue& Value);
+	void OnSprintUpdate(const FInputActionValue& Value);
 	void OnEndSprint(const FInputActionValue& Value);
 	
 	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category = "Sprint",meta = (AllowPrivateAccess = true))
@@ -66,5 +66,9 @@ private:
 	float StaminaDepletionRate;
 	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category = "Sprint",meta = (AllowPrivateAccess = true))
 	float StaminaRecoveryRate;
-	
+
+	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly,Category = "Camera",meta = (AllowPrivateAccess = true))
+	TSubclassOf<UCameraShakeBase> WalkCameraShake;
+	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly,Category = "Camera",meta = (AllowPrivateAccess = true))
+	TSubclassOf<UCameraShakeBase> SprintCameraShake;
 };

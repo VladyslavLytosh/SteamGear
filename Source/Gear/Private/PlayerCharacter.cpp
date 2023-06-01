@@ -69,7 +69,11 @@ void APlayerCharacter::Tick(float DeltaTime)
 			CurrentStamina += StaminaRecoveryRate * DeltaTime;
 		}
 	}
-
+	const FVector PlayerVelocity = GetVelocity();
+	if (PlayerVelocity == FVector::ZeroVector)
+	{
+		GetWorld()->GetFirstPlayerController()->PlayerCameraManager->StopAllCameraShakes();
+	}
 	
 }
 
@@ -82,7 +86,7 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		EnhancedInputComponent->BindAction(MoveAction,ETriggerEvent::Triggered,this,&APlayerCharacter::Move);
 		EnhancedInputComponent->BindAction(LookAction,ETriggerEvent::Triggered,this,&APlayerCharacter::Look);
 		EnhancedInputComponent->BindAction(JumpAction,ETriggerEvent::Triggered,this,&APlayerCharacter::Jump);
-		EnhancedInputComponent->BindAction(SprintAction,ETriggerEvent::Triggered,this,&APlayerCharacter::OnStartSprint);
+		EnhancedInputComponent->BindAction(SprintAction,ETriggerEvent::Triggered,this,&APlayerCharacter::OnSprintUpdate);
 		EnhancedInputComponent->BindAction(SprintAction,ETriggerEvent::Completed,this,&APlayerCharacter::OnEndSprint);
 	}
 
@@ -98,6 +102,7 @@ void APlayerCharacter::Move(const FInputActionValue& Value)
 		AddMovementInput(GetActorForwardVector(),DirectionalValue.Y);
 		// We take X axis from DirectionalValue, so we can move left/right
 		AddMovementInput(GetActorRightVector(),DirectionalValue.X);
+		GetWorld()->GetFirstPlayerController()->PlayerCameraManager->StartCameraShake(WalkCameraShake);
 	}
 }
 
@@ -114,15 +119,17 @@ void APlayerCharacter::Look(const FInputActionValue& Value)
 	}
 }
 
-void APlayerCharacter::OnStartSprint(const FInputActionValue& Value)
+void APlayerCharacter::OnSprintUpdate(const FInputActionValue& Value)
 {
-	if (CurrentStamina <= 0)
+	if (CurrentStamina <= 0 || GetVelocity() == FVector::ZeroVector || GetCharacterMovement()->IsFalling())
 	{
 		OnEndSprint(Value);
 		return;
 	}
 	GetCharacterMovement()->MaxWalkSpeed = SprintSpeedModifier;
 	bIsSprinting = true;
+	GetWorld()->GetFirstPlayerController()->PlayerCameraManager->StopCameraShake(Cast<UCameraShakeBase>(WalkCameraShake));
+	GetWorld()->GetFirstPlayerController()->PlayerCameraManager->StartCameraShake(SprintCameraShake);
 }
 
 void APlayerCharacter::OnEndSprint(const FInputActionValue& Value)
