@@ -10,6 +10,15 @@
 /**
  * 
  */
+
+UENUM()
+enum class EPlayerState : uint8
+{
+	Idle,
+	Walking,
+	Sprinting
+};
+
 UCLASS()
 class GEAR_API APlayerCharacter : public ABaseCharacter
 {
@@ -54,10 +63,12 @@ private:
 	void OnSprintUpdate(const FInputActionValue& Value);
 	void OnEndSprint(const FInputActionValue& Value);
 	
+	void StartStaminaRecovery();
+	void RecoverStamina(float DeltaTime);
+
 	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category = "Sprint",meta = (AllowPrivateAccess = true))
 	float SprintSpeedModifier;
 	float MaxWalkSpeed;
-	bool bIsSprinting;
 
 	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category = "Sprint",meta = (AllowPrivateAccess = true))
 	float MaxStamina;
@@ -71,4 +82,11 @@ private:
 	TSubclassOf<UCameraShakeBase> WalkCameraShake;
 	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly,Category = "Camera",meta = (AllowPrivateAccess = true))
 	TSubclassOf<UCameraShakeBase> SprintCameraShake;
+
+	EPlayerState PlayerState;
+
+	FTimerHandle StaminaRecoveryTimerHandle;
+	float StaminaRecoveryDelay;
+	bool bStaminaRegenerates;
+	
 };

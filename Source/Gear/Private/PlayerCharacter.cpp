@@ -8,6 +8,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 
 
+
 APlayerCharacter::APlayerCharacter()
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
@@ -20,12 +21,15 @@ APlayerCharacter::APlayerCharacter()
 	// Config camera component setting, so we can make first person camera look
 	CameraComponent->bUsePawnControlRotation = true;
 	CameraComponent->SetRelativeLocation(FVector(-10.f,0.f,60.f));
-
-	bIsSprinting = false;
+	
 	MaxStamina = 100;
 	StaminaDepletionRate = 10.f;
 	StaminaRecoveryRate = 15.f;
 	SprintSpeedModifier = 100.f;
+
+	PlayerState = EPlayerState::Idle;
+
+	StaminaRecoveryDelay = 5.0f;
 }
 
 void APlayerCharacter::PostInitializeComponents()
@@ -56,23 +60,34 @@ void APlayerCharacter::BeginPlay()
 void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
+	
 	UE_LOG(LogTemp,Display,TEXT("Current Stamina: %f"),CurrentStamina);
-	if (bIsSprinting && CurrentStamina > 0)
+	if (PlayerState == EPlayerState::Sprinting && CurrentStamina > 0)
 	{
 		CurrentStamina -= StaminaDepletionRate * DeltaTime;
 	}
-	else
+	
+	RecoverStamina(DeltaTime);
+	
+	if (GetVelocity() == FVector::ZeroVector)
 	{
-		if (CurrentStamina < MaxStamina)
-		{
-			CurrentStamina += StaminaRecoveryRate * DeltaTime;
-		}
+		PlayerState = EPlayerState::Idle;
+
 	}
-	const FVector PlayerVelocity = GetVelocity();
-	if (PlayerVelocity == FVector::ZeroVector)
+	if (!GetCharacterMovement()->IsFalling())
 	{
-		GetWorld()->GetFirstPlayerController()->PlayerCameraManager->StopAllCameraShakes();
+		switch (PlayerState)
+		{
+		case EPlayerState::Idle:
+			GetWorld()->GetFirstPlayerController()->PlayerCameraManager->StopAllCameraShakes();
+			break;
+		case EPlayerState::Walking:
+			GetWorld()->GetFirstPlayerController()->PlayerCameraManager->StartCameraShake(WalkCameraShake);
+			break;
+		case EPlayerState::Sprinting:
+			GetWorld()->GetFirstPlayerController()->PlayerCameraManager->StartCameraShake(SprintCameraShake);
+			break;
+		}
 	}
 	
 }
@@ -102,7 +117,7 @@ void APlayerCharacter::Move(const FInputActionValue& Value)
 		AddMovementInput(GetActorForwardVector(),DirectionalValue.Y);
 		// We take X axis from DirectionalValue, so we can move left/right
 		AddMovementInput(GetActorRightVector(),DirectionalValue.X);
-		GetWorld()->GetFirstPlayerController()->PlayerCameraManager->StartCameraShake(WalkCameraShake);
+		PlayerState = EPlayerState::Walking;
 	}
 }
 
@@ -127,13 +142,34 @@ void APlayerCharacter::OnSprintUpdate(const FInputActionValue& Value)
 		return;
 	}
 	GetCharacterMovement()->MaxWalkSpeed = SprintSpeedModifier;
-	bIsSprinting = true;
-	GetWorld()->GetFirstPlayerController()->PlayerCameraManager->StopCameraShake(Cast<UCameraShakeBase>(WalkCameraShake));
-	GetWorld()->GetFirstPlayerController()->PlayerCameraManager->StartCameraShake(SprintCameraShake);
+	PlayerState = EPlayerState::Sprinting;
+	bStaminaRegenerates = false;
 }
 
 void APlayerCharacter::OnEndSprint(const FInputActionValue& Value)
 {
 	GetCharacterMovement()->MaxWalkSpeed = MaxWalkSpeed;
-	bIsSprinting = false;
+	PlayerState = EPlayerState::Walking;
+	GetWorldTimerManager().SetTimer(StaminaRecoveryTimerHandle,this,&APlayerCharacter::StartStaminaRecovery,StaminaRecoveryDelay,false);
+}
+
+
+void APlayerCharacter::StartStaminaRecovery()
+{
+	bStaminaRegenerates = true;
+}
+
+void APlayerCharacter::RecoverStamina(float DeltaTime)
+{
+	if (!bStaminaRegenerates)
+	{
+		return;
+	}
+	if (CurrentStamina < MaxStamina)
+	{
+		CurrentStamina += StaminaRecoveryRate * DeltaTime;
+		CurrentStamina = FMath::Clamp(CurrentStamina, 0.0f, MaxStamina);
+		return;
+	}
+	bStaminaRegenerates = false;
 }
