@@ -60,35 +60,25 @@ void APlayerCharacter::BeginPlay()
 void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	
-	UE_LOG(LogTemp,Display,TEXT("Current Stamina: %f"),CurrentStamina);
-	if (PlayerState == EPlayerState::Sprinting && CurrentStamina > 0)
+
+	if (!IsValid(this))
 	{
-		CurrentStamina -= StaminaDepletionRate * DeltaTime;
+		return;
 	}
 	
-	RecoverStamina(DeltaTime);
+#if !UE_BUILD_SHIPPING
+	UE_LOG(LogTemp,Display,TEXT("Current Stamina: %f"),CurrentStamina);
+#endif
+
+	DecreaseStamina(DeltaTime);
+	RecoverStamina(DeltaTime);	
 	
-	if (GetVelocity() == FVector::ZeroVector)
+	constexpr float VelocityThreshold = 0.01f;
+	if (GetVelocity().SizeSquared() <= FMath::Square(VelocityThreshold))
 	{
 		PlayerState = EPlayerState::Idle;
-
 	}
-	if (!GetCharacterMovement()->IsFalling())
-	{
-		switch (PlayerState)
-		{
-		case EPlayerState::Idle:
-			GetWorld()->GetFirstPlayerController()->PlayerCameraManager->StopAllCameraShakes();
-			break;
-		case EPlayerState::Walking:
-			GetWorld()->GetFirstPlayerController()->PlayerCameraManager->StartCameraShake(WalkCameraShake);
-			break;
-		case EPlayerState::Sprinting:
-			GetWorld()->GetFirstPlayerController()->PlayerCameraManager->StartCameraShake(SprintCameraShake);
-			break;
-		}
-	}
+	UpdateCameraShake();
 	
 }
 
@@ -136,7 +126,8 @@ void APlayerCharacter::Look(const FInputActionValue& Value)
 
 void APlayerCharacter::OnSprintUpdate(const FInputActionValue& Value)
 {
-	if (CurrentStamina <= 0 || GetVelocity() == FVector::ZeroVector || GetCharacterMovement()->IsFalling())
+	if (constexpr float VelocityThreshold = 0.01f;
+		CurrentStamina <= 0 || GetVelocity().SizeSquared() <= FMath::Square(VelocityThreshold) || GetCharacterMovement()->IsFalling())
 	{
 		OnEndSprint(Value);
 		return;
@@ -144,6 +135,7 @@ void APlayerCharacter::OnSprintUpdate(const FInputActionValue& Value)
 	GetCharacterMovement()->MaxWalkSpeed = SprintSpeedModifier;
 	PlayerState = EPlayerState::Sprinting;
 	bStaminaRegenerates = false;
+	GetWorldTimerManager().ClearTimer(StaminaRecoveryTimerHandle);
 }
 
 void APlayerCharacter::OnEndSprint(const FInputActionValue& Value)
@@ -172,4 +164,31 @@ void APlayerCharacter::RecoverStamina(float DeltaTime)
 		return;
 	}
 	bStaminaRegenerates = false;
+}
+
+void APlayerCharacter::UpdateCameraShake() const
+{
+	if (!GetCharacterMovement()->IsFalling())
+	{
+		switch (PlayerState)
+		{
+		case EPlayerState::Idle:
+			GetWorld()->GetFirstPlayerController()->PlayerCameraManager->StopAllCameraShakes();
+			break;
+		case EPlayerState::Walking:
+			GetWorld()->GetFirstPlayerController()->PlayerCameraManager->StartCameraShake(WalkCameraShake);
+			break;
+		case EPlayerState::Sprinting:
+			GetWorld()->GetFirstPlayerController()->PlayerCameraManager->StartCameraShake(SprintCameraShake);
+			break;
+		}
+	}
+}
+
+void APlayerCharacter::DecreaseStamina(float DeltaTime)
+{
+	if (PlayerState == EPlayerState::Sprinting && CurrentStamina > 0)
+	{
+		CurrentStamina -= StaminaDepletionRate * DeltaTime;
+	}
 }

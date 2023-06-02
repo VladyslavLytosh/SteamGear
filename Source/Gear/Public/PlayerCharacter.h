@@ -65,6 +65,9 @@ private:
 	
 	void StartStaminaRecovery();
 	void RecoverStamina(float DeltaTime);
+	void DecreaseStamina(float DeltaTime);
+
+	void UpdateCameraShake() const;
 
 	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category = "Sprint",meta = (AllowPrivateAccess = true))
 	float SprintSpeedModifier;
@@ -84,9 +87,10 @@ private:
 	TSubclassOf<UCameraShakeBase> SprintCameraShake;
 
 	EPlayerState PlayerState;
-
-	FTimerHandle StaminaRecoveryTimerHandle;
+	
+	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly,Category = "Sprint",meta = (AllowPrivateAccess = true))
 	float StaminaRecoveryDelay;
 	bool bStaminaRegenerates;
+	FTimerHandle StaminaRecoveryTimerHandle;
 	
 };
