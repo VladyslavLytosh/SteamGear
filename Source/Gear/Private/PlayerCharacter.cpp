@@ -30,6 +30,10 @@ APlayerCharacter::APlayerCharacter()
 	PlayerState = EPlayerState::Idle;
 
 	StaminaRecoveryDelay = 5.0f;
+	
+	TargetShakeScale = 0.0f;
+	CurrentShakeScale = 0.0f;
+	ShakeScaleInterpSpeed = 1.f;
 }
 
 void APlayerCharacter::PostInitializeComponents()
@@ -78,7 +82,7 @@ void APlayerCharacter::Tick(float DeltaTime)
 	{
 		PlayerState = EPlayerState::Idle;
 	}
-	UpdateCameraShake();
+	UpdateCameraShake(DeltaTime);
 	
 }
 
@@ -166,22 +170,24 @@ void APlayerCharacter::RecoverStamina(float DeltaTime)
 	bStaminaRegenerates = false;
 }
 
-void APlayerCharacter::UpdateCameraShake() const
+void APlayerCharacter::UpdateCameraShake(float DeltaTime)
 {
 	if (!GetCharacterMovement()->IsFalling())
 	{
 		switch (PlayerState)
 		{
 		case EPlayerState::Idle:
-			GetWorld()->GetFirstPlayerController()->PlayerCameraManager->StopAllCameraShakes();
+			TargetShakeScale = 0.f;
 			break;
 		case EPlayerState::Walking:
-			GetWorld()->GetFirstPlayerController()->PlayerCameraManager->StartCameraShake(WalkCameraShake);
+			TargetShakeScale = 1.f;
 			break;
 		case EPlayerState::Sprinting:
-			GetWorld()->GetFirstPlayerController()->PlayerCameraManager->StartCameraShake(SprintCameraShake);
+			TargetShakeScale = 2.f;
 			break;
 		}
+		CurrentShakeScale = FMath::FInterpTo(CurrentShakeScale, TargetShakeScale, DeltaTime, ShakeScaleInterpSpeed);
+		GetWorld()->GetFirstPlayerController()->PlayerCameraManager->StartCameraShake(MovementCameraShake,CurrentShakeScale);
 	}
 }
 
