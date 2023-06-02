@@ -18,17 +18,20 @@ APlayerCharacter::APlayerCharacter()
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("Player Camera"));
 	CameraComponent->SetupAttachment(GetRootComponent());
 	
-	// Config camera component setting, so we can make first person camera look
+	// Configure camera component settings for first-person perspective
 	CameraComponent->bUsePawnControlRotation = true;
 	CameraComponent->SetRelativeLocation(FVector(-10.f,0.f,60.f));
 	
+	// Initialize player stamina-related and sprint variables
 	MaxStamina = 100;
 	StaminaDepletionRate = 10.f;
 	StaminaRecoveryRate = 15.f;
 	SprintSpeedModifier = 100.f;
-
+	
+	// Set the initial player state to idle
 	PlayerState = EPlayerState::Idle;
 	
+	// Initialize camera shake variables
 	TargetShakeScale = 0.0f;
 	CurrentShakeScale = 0.0f;
 	ShakeScaleInterpSpeed = 1.f;
@@ -39,7 +42,11 @@ void APlayerCharacter::PostInitializeComponents()
 	Super::PostInitializeComponents();
 
 	MaxWalkSpeed = GetCharacterMovement()->MaxWalkSpeed;
+	
+	// Initialize current stamina to the maximum value
 	CurrentStamina = MaxStamina;
+	
+	// Set the sprint speed modifier to the maximum walking speed plus the sprint speed modifier
 	SprintSpeedModifier += GetCharacterMovement()->MaxWalkSpeed;
 }
 
@@ -62,7 +69,8 @@ void APlayerCharacter::BeginPlay()
 void APlayerCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
+	
+	// Skip further processing if the character is not valid
 	if (!IsValid(this))
 	{
 		return;
@@ -71,7 +79,8 @@ void APlayerCharacter::Tick(float DeltaTime)
 #if !UE_BUILD_SHIPPING
 	UE_LOG(LogTemp,Display,TEXT("Current Stamina: %f"),CurrentStamina);
 #endif
-
+	
+	// Decrease the player's stamina and recover it based on the player state and current stamina number
 	DecreaseStamina(DeltaTime);
 	RecoverStamina(DeltaTime);	
 	
@@ -88,6 +97,7 @@ void APlayerCharacter::Tick(float DeltaTime)
 void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
+	// Bind various input actions to corresponding functions
 	if (const TObjectPtr<UEnhancedInputComponent> EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent))
 	{
 		EnhancedInputComponent->BindAction(MoveAction,ETriggerEvent::Triggered,this,&APlayerCharacter::Move);
@@ -105,10 +115,10 @@ void APlayerCharacter::Move(const FInputActionValue& Value)
 
 	if (Controller != nullptr)
 	{
-		// We take Y axis from DirectionalValue, so we can move forward/backward
-		AddMovementInput(GetActorForwardVector(),DirectionalValue.Y);
-		// We take X axis from DirectionalValue, so we can move left/right
-		AddMovementInput(GetActorRightVector(),DirectionalValue.X);
+		// Move the character forward/backward based on the Y axis of the DirectionalValue
+		AddMovementInput(GetActorForwardVector(), DirectionalValue.Y);
+		// Move the character left/right based on the X axis of the DirectionalValue
+		AddMovementInput(GetActorRightVector(), DirectionalValue.X);
 		PlayerState = EPlayerState::Walking;
 	}
 }
@@ -119,9 +129,9 @@ void APlayerCharacter::Look(const FInputActionValue& Value)
 
 	if (Controller != nullptr)
 	{
-		// We take X axis from DirectionalValue, so we can look left/right
+		// Adjust the controller's yaw input based on the X axis of the LookAxisValue
 		AddControllerYawInput(LookAxisValue.X);
-		// We take Y axis from DirectionalValue, so we can look up/down
+		// Adjust the controller's pitch input based on the Y axis of the LookAxisValue
 		AddControllerPitchInput(LookAxisValue.Y);
 	}
 }
@@ -134,12 +144,14 @@ void APlayerCharacter::OnSprintUpdate(const FInputActionValue& Value)
 		OnEndSprint(Value);
 		return;
 	}
+	// Set the character's maximum walk speed to the sprint speed modifier
 	GetCharacterMovement()->MaxWalkSpeed = SprintSpeedModifier;
 	PlayerState = EPlayerState::Sprinting;
 }
 
 void APlayerCharacter::OnEndSprint(const FInputActionValue& Value)
 {
+	// Reset the character's maximum walk speed to the default value
 	GetCharacterMovement()->MaxWalkSpeed = MaxWalkSpeed;
 	PlayerState = EPlayerState::Walking;
 }
@@ -148,6 +160,7 @@ void APlayerCharacter::RecoverStamina(float DeltaTime)
 {
 	if (CurrentStamina < MaxStamina && PlayerState != EPlayerState::Sprinting)
 	{
+		// Increase the current stamina based on the recovery rate and delta time
 		CurrentStamina += StaminaRecoveryRate * DeltaTime;
 		CurrentStamina = FMath::Clamp(CurrentStamina, 0.0f, MaxStamina);
 	}
@@ -169,7 +182,9 @@ void APlayerCharacter::UpdateCameraShake(float DeltaTime)
 			TargetShakeScale = 2.f;
 			break;
 		}
+		// Interpolate the current shake scale towards the target shake scale
 		CurrentShakeScale = FMath::FInterpTo(CurrentShakeScale, TargetShakeScale, DeltaTime, ShakeScaleInterpSpeed);
+		// Start the camera shake effect with the specified camera shake class and current shake scale
 		GetWorld()->GetFirstPlayerController()->PlayerCameraManager->StartCameraShake(MovementCameraShake,CurrentShakeScale);
 	}
 }
@@ -178,6 +193,7 @@ void APlayerCharacter::DecreaseStamina(float DeltaTime)
 {
 	if (PlayerState == EPlayerState::Sprinting && CurrentStamina > 0)
 	{
+		// Decrease the current stamina based on the depletion rate and delta time
 		CurrentStamina -= StaminaDepletionRate * DeltaTime;
 	}
 }

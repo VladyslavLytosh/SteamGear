@@ -11,6 +11,7 @@
  * 
  */
 
+// Enumeration defining player states
 UENUM()
 enum class EPlayerState : uint8
 {
@@ -27,8 +28,10 @@ class GEAR_API APlayerCharacter : public ABaseCharacter
 public:
 	// Sets default values for this character's properties
 	APlayerCharacter();
-
+	
+	// Function called after components have been initialized
 	virtual void PostInitializeComponents() override;
+	
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -41,6 +44,7 @@ public:
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 private:
+	// Pointers to various input actions
 	UPROPERTY(EditAnywhere, Category = "Input")
 	TObjectPtr<class UInputMappingContext> DefaultMappingContext;
 	UPROPERTY(EditAnywhere, Category = "Input")
@@ -51,21 +55,24 @@ private:
 	TObjectPtr<class UInputAction> JumpAction;
 	UPROPERTY(EditAnywhere, Category = "Input")
 	TObjectPtr<class UInputAction> SprintAction;
-
-	// We bind Move function to the corresponding input action, so character can move 
-	void Move(const FInputActionValue& Value);
-	// We bind Look function to the corresponding input action, so character can look around 
-	void Look(const FInputActionValue& Value);
-
+	
 	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly,Category = "Camera",meta = (AllowPrivateAccess = true))
 	TObjectPtr<class UCameraComponent> CameraComponent;
 
-	void OnSprintUpdate(const FInputActionValue& Value);
-	void OnEndSprint(const FInputActionValue& Value);
+	void Move(const FInputActionValue& Value);
+	void Look(const FInputActionValue& Value);
 	
+	// Function to handle sprint input update
+	void OnSprintUpdate(const FInputActionValue& Value);
+	// Function to handle end of sprint input
+	void OnEndSprint(const FInputActionValue& Value);
+	// If current stamina less than max stamina and the player is not running, we recover stamina
+	// (the number by which is added to the stamina is based on the StaminaRecoveryRate variable)
 	void RecoverStamina(float DeltaTime);
+	// If current stamina more than 0 and the player running, we decrease stamina
+	// (the number by which is subtract to the stamina is based on the StaminaDepletionRate variable)
 	void DecreaseStamina(float DeltaTime);
-
+	// Update the camera shake effect based on the player state
 	void UpdateCameraShake(float DeltaTime);
 
 	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category = "Sprint",meta = (AllowPrivateAccess = true))
