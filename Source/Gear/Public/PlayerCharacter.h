@@ -63,7 +63,6 @@ private:
 	void OnSprintUpdate(const FInputActionValue& Value);
 	void OnEndSprint(const FInputActionValue& Value);
 	
-	void StartStaminaRecovery();
 	void RecoverStamina(float DeltaTime);
 	void DecreaseStamina(float DeltaTime);
 
@@ -85,11 +84,6 @@ private:
 	TSubclassOf<UCameraShakeBase> MovementCameraShake;
 
 	EPlayerState PlayerState;
-	
-	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly,Category = "Sprint",meta = (AllowPrivateAccess = true))
-	float StaminaRecoveryDelay;
-	bool bStaminaRegenerates;
-	FTimerHandle StaminaRecoveryTimerHandle;
 	
 	float TargetShakeScale;
 	float CurrentShakeScale;

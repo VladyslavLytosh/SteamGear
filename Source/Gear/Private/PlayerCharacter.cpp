@@ -28,8 +28,6 @@ APlayerCharacter::APlayerCharacter()
 	SprintSpeedModifier = 100.f;
 
 	PlayerState = EPlayerState::Idle;
-
-	StaminaRecoveryDelay = 5.0f;
 	
 	TargetShakeScale = 0.0f;
 	CurrentShakeScale = 0.0f;
@@ -130,44 +128,29 @@ void APlayerCharacter::Look(const FInputActionValue& Value)
 
 void APlayerCharacter::OnSprintUpdate(const FInputActionValue& Value)
 {
-	if (constexpr float VelocityThreshold = 0.01f;
-		CurrentStamina <= 0 || GetVelocity().SizeSquared() <= FMath::Square(VelocityThreshold) || GetCharacterMovement()->IsFalling())
+	constexpr float VelocityThreshold = 0.01f;
+	if (CurrentStamina <= 0 || GetVelocity().SizeSquared() <= FMath::Square(VelocityThreshold) || GetCharacterMovement()->IsFalling())
 	{
 		OnEndSprint(Value);
 		return;
 	}
 	GetCharacterMovement()->MaxWalkSpeed = SprintSpeedModifier;
 	PlayerState = EPlayerState::Sprinting;
-	bStaminaRegenerates = false;
-	GetWorldTimerManager().ClearTimer(StaminaRecoveryTimerHandle);
 }
 
 void APlayerCharacter::OnEndSprint(const FInputActionValue& Value)
 {
 	GetCharacterMovement()->MaxWalkSpeed = MaxWalkSpeed;
 	PlayerState = EPlayerState::Walking;
-	GetWorldTimerManager().SetTimer(StaminaRecoveryTimerHandle,this,&APlayerCharacter::StartStaminaRecovery,StaminaRecoveryDelay,false);
-}
-
-
-void APlayerCharacter::StartStaminaRecovery()
-{
-	bStaminaRegenerates = true;
 }
 
 void APlayerCharacter::RecoverStamina(float DeltaTime)
 {
-	if (!bStaminaRegenerates)
-	{
-		return;
-	}
-	if (CurrentStamina < MaxStamina)
+	if (CurrentStamina < MaxStamina && PlayerState != EPlayerState::Sprinting)
 	{
 		CurrentStamina += StaminaRecoveryRate * DeltaTime;
 		CurrentStamina = FMath::Clamp(CurrentStamina, 0.0f, MaxStamina);
-		return;
 	}
-	bStaminaRegenerates = false;
 }
 
 void APlayerCharacter::UpdateCameraShake(float DeltaTime)
