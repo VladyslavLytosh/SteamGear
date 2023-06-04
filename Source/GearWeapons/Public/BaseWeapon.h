@@ -57,8 +57,8 @@ public:
 	// Function called after components have been initialized
 	virtual void PostInitializeComponents() override;
 
-	virtual void OnStartFire();
-	virtual void OnStopFire();
+	virtual void StartFire();
+	virtual void StopFire();
 	virtual void OnStartEquipping();
 	virtual void OnEndEquipping();
 	
@@ -68,6 +68,6 @@ protected:
 	EWeaponState WeaponState;
 	int32 CurrentAmmoInClip;
 	virtual bool CanFire();
-	virtual void Fire() {  };
+	virtual void Fire();
 	FTimerHandle FireRateTimer;
 };

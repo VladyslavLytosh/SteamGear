@@ -82,9 +82,7 @@ void APlayerCharacter::Tick(float DeltaTime)
 		return;
 	}
 	
-#if !UE_BUILD_SHIPPING
-	UE_LOG(LogTemp,Display,TEXT("Current Stamina: %f"),CurrentStamina);
-#endif
+
 	
 	// Decrease the player's stamina and recover it based on the player state and current stamina number
 	DecreaseStamina(DeltaTime);
@@ -201,7 +199,7 @@ void APlayerCharacter::OnStartFire(const FInputActionValue& Value)
 {
 	if (CurrentWeapon != nullptr)
 	{
-		CurrentWeapon->OnStartFire();
+		CurrentWeapon->StartFire();
 	}
 }
 
@@ -209,7 +207,7 @@ void APlayerCharacter::OnEndFire(const FInputActionValue& Value)
 {
 	if (CurrentWeapon != nullptr)
 	{
-		CurrentWeapon->OnStopFire();
+		CurrentWeapon->StopFire();
 	}
 }
 

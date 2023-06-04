@@ -15,6 +15,10 @@ struct FHitScanWeaponData
 	GENERATED_BODY()
 	UPROPERTY(EditDefaultsOnly,Category="WeaponStats")
 	float WeaponRange;
+	FHitScanWeaponData()
+	{
+		WeaponRange = 2500;
+	}
 };
 
 UCLASS()

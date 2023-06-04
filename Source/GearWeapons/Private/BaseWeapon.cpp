@@ -17,18 +17,21 @@ void ABaseWeapon::PostInitializeComponents()
 	CurrentAmmoInClip = WeaponConfig.MaxClipAmmo;
 }
 
-void ABaseWeapon::OnStartFire()
+void ABaseWeapon::StartFire()
 {
-	if (CanFire())
+	WeaponState = EWeaponState::Firing;
+	if (!GetWorld()->GetTimerManager().IsTimerActive(FireRateTimer))
 	{
-		WeaponState = EWeaponState::Firing;
-		GetWorld()->GetTimerManager().SetTimer(FireRateTimer,this, &ABaseWeapon::Fire, WeaponConfig.TimeBetweenShots,true);
+		Fire(); 
+		GetWorld()->GetTimerManager().SetTimer(FireRateTimer, this, &ABaseWeapon::Fire, WeaponConfig.TimeBetweenShots, true);
 	}
 }
 
-void ABaseWeapon::OnStopFire()
+void ABaseWeapon::StopFire()
 {
+	WeaponState = EWeaponState::Idle;
 	GetWorldTimerManager().ClearTimer(FireRateTimer);	
+	
 }
 
 void ABaseWeapon::OnStartEquipping()
@@ -44,12 +47,19 @@ void ABaseWeapon::OnEndEquipping()
 bool ABaseWeapon::CanFire()
 {
 	if (CurrentAmmoInClip > 0 &&
-		WeaponState != EWeaponState::Reloading ||
-		WeaponState != EWeaponState::Equipping)
+		(WeaponState != EWeaponState::Reloading ||
+		WeaponState != EWeaponState::Equipping))
 	{
 		return true;
 	}
 	return false;
+}
+
+void ABaseWeapon::Fire()
+{
+#if !UE_BUILD_SHIPPING
+	UE_LOG(LogTemp,Display,TEXT("Current Ammo in Clip: %d"),CurrentAmmoInClip);
+#endif
 }
 
 

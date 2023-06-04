@@ -8,16 +8,22 @@
 
 void AHitScanWeapon::Fire()
 {
-	Super::Fire();
+	if (!CanFire())
+		return;
+	
 	FHitResult HitResult;
 	FVector LineStart = UGameplayStatics::GetPlayerCameraManager(this, 0)->GetCameraLocation();;
 	FVector LineEnd = UGameplayStatics::GetPlayerCameraManager(this, 0)->GetCameraRotation().Vector();;
 	GetWorld()->LineTraceSingleByChannel(HitResult,LineStart,LineEnd * HitScanWeaponConfig.WeaponRange + LineStart,ECC_Visibility);
 #if !UE_BUILD_SHIPPING
-	DrawDebugLine(GetWorld(),LineStart,LineEnd * HitScanWeaponConfig.WeaponRange + LineStart,FColor::Red,true,2);
+	DrawDebugLine(GetWorld(),LineStart,LineEnd * HitScanWeaponConfig.WeaponRange + LineStart,FColor::Red,false,0.5f);
+	DrawDebugPoint(GetWorld(), HitResult.ImpactPoint, 10.0f, FColor::Green, false, 0.5f);
 #endif
 	if (HitResult.GetActor())
 	{
 		
 	}
+	CurrentAmmoInClip--;
+
+	Super::Fire();
 }
