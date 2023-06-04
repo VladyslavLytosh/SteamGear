@@ -16,11 +16,15 @@ void ABaseWeapon::PostInitializeComponents()
 	Super::PostInitializeComponents();
 }
 
-void ABaseWeapon::StartFire()
+void ABaseWeapon::OnStartFire()
 {
+	if (CanFire())
+	{
+		Fire();
+	}
 }
 
-void ABaseWeapon::StopFire()
+void ABaseWeapon::OnStopFire()
 {
 }
 
@@ -30,6 +34,17 @@ void ABaseWeapon::OnStartEquipping()
 
 void ABaseWeapon::OnEndEquipping()
 {
+}
+
+bool ABaseWeapon::CanFire()
+{
+	if (CurrentAmmoInClip > 0 &&
+		WeaponState != EWeaponState::Reloading ||
+		WeaponState != EWeaponState::Equipping)
+	{
+		return true;
+	}
+	return false;
 }
 
 

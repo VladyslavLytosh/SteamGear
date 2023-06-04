@@ -57,9 +57,16 @@ public:
 	// Function called after components have been initialized
 	virtual void PostInitializeComponents() override;
 
-	void StartFire();
-	void StopFire();
-	void OnStartEquipping();
-	void OnEndEquipping();
+	virtual void OnStartFire();
+	virtual void OnStopFire();
+	virtual void OnStartEquipping();
+	virtual void OnEndEquipping();
 	
+protected:
+	UPROPERTY(EditDefaultsOnly,Category= "Config|Weapon")
+	FWeaponData WeaponConfig;
+	EWeaponState WeaponState;
+	int32 CurrentAmmoInClip;
+	virtual bool CanFire();
+	virtual void Fire() { };
 };
