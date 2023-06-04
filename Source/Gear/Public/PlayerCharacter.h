@@ -50,11 +50,13 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Input")
 	TObjectPtr<class UInputAction> MoveAction;
 	UPROPERTY(EditAnywhere, Category = "Input")
-	TObjectPtr<class UInputAction> LookAction;
+	TObjectPtr<UInputAction> LookAction;
 	UPROPERTY(EditAnywhere, Category = "Input")
-	TObjectPtr<class UInputAction> JumpAction;
+	TObjectPtr<UInputAction> JumpAction;
 	UPROPERTY(EditAnywhere, Category = "Input")
-	TObjectPtr<class UInputAction> SprintAction;
+	TObjectPtr<UInputAction> SprintAction;
+	UPROPERTY(EditAnywhere, Category = "Input")
+	TObjectPtr<UInputAction> FireAction;
 	
 	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly,Category = "Camera",meta = (AllowPrivateAccess = true))
 	TObjectPtr<class UCameraComponent> CameraComponent;
@@ -74,6 +76,9 @@ private:
 	void DecreaseStamina(float DeltaTime);
 	// Update the camera shake effect based on the player state
 	void UpdateCameraShake(float DeltaTime);
+	
+	void OnStartFire(const FInputActionValue& Value);
+	void OnEndFire(const FInputActionValue& Value);
 
 	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category = "Sprint",meta = (AllowPrivateAccess = true))
 	float SprintSpeedModifier;
@@ -96,5 +101,7 @@ private:
 	float CurrentShakeScale;
 	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly,Category = "Camera|CameraShake",meta = (AllowPrivateAccess = true))
 	float ShakeScaleInterpSpeed;
-	
+	UPROPERTY(EditDefaultsOnly)
+	TArray<TSubclassOf<class ABaseWeapon>> WeaponInventory;
+	TObjectPtr<ABaseWeapon> CurrentWeapon;
 };

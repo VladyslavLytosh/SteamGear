@@ -14,26 +14,31 @@ ABaseWeapon::ABaseWeapon()
 void ABaseWeapon::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
+	CurrentAmmoInClip = WeaponConfig.MaxClipAmmo;
 }
 
 void ABaseWeapon::OnStartFire()
 {
 	if (CanFire())
 	{
-		Fire();
+		WeaponState = EWeaponState::Firing;
+		GetWorld()->GetTimerManager().SetTimer(FireRateTimer,this, &ABaseWeapon::Fire, WeaponConfig.TimeBetweenShots,true);
 	}
 }
 
 void ABaseWeapon::OnStopFire()
 {
+	GetWorldTimerManager().ClearTimer(FireRateTimer);	
 }
 
 void ABaseWeapon::OnStartEquipping()
 {
+	
 }
 
 void ABaseWeapon::OnEndEquipping()
 {
+	
 }
 
 bool ABaseWeapon::CanFire()

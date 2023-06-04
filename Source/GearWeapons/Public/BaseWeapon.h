@@ -68,5 +68,6 @@ protected:
 	EWeaponState WeaponState;
 	int32 CurrentAmmoInClip;
 	virtual bool CanFire();
-	virtual void Fire() { CurrentAmmoInClip--; };
+	virtual void Fire() {  };
+	FTimerHandle FireRateTimer;
 };

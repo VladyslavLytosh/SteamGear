@@ -2,6 +2,8 @@
 
 
 #include "PlayerCharacter.h"
+
+#include "BaseWeapon.h"
 #include "Camera/CameraComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
@@ -35,6 +37,7 @@ APlayerCharacter::APlayerCharacter()
 	TargetShakeScale = 0.0f;
 	CurrentShakeScale = 0.0f;
 	ShakeScaleInterpSpeed = 1.f;
+
 }
 
 void APlayerCharacter::PostInitializeComponents()
@@ -48,6 +51,7 @@ void APlayerCharacter::PostInitializeComponents()
 	
 	// Set the sprint speed modifier to the maximum walking speed plus the sprint speed modifier
 	SprintSpeedModifier += GetCharacterMovement()->MaxWalkSpeed;
+	
 }
 
 // Called when the game starts or when spawned
@@ -63,6 +67,8 @@ void APlayerCharacter::BeginPlay()
 			Subsystem->AddMappingContext(DefaultMappingContext,0);
 		}
 	}
+	CurrentWeapon = GetWorld()->SpawnActor<ABaseWeapon>(WeaponInventory[0], GetActorLocation(), GetActorRotation());
+
 }
 
 // Called every frame
@@ -105,6 +111,8 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		EnhancedInputComponent->BindAction(JumpAction,ETriggerEvent::Triggered,this,&APlayerCharacter::Jump);
 		EnhancedInputComponent->BindAction(SprintAction,ETriggerEvent::Triggered,this,&APlayerCharacter::OnSprintUpdate);
 		EnhancedInputComponent->BindAction(SprintAction,ETriggerEvent::Completed,this,&APlayerCharacter::OnEndSprint);
+		EnhancedInputComponent->BindAction(FireAction,ETriggerEvent::Started,this,&APlayerCharacter::OnStartFire);
+		EnhancedInputComponent->BindAction(FireAction,ETriggerEvent::Completed,this,&APlayerCharacter::OnEndFire);
 	}
 
 }
@@ -186,6 +194,22 @@ void APlayerCharacter::UpdateCameraShake(float DeltaTime)
 		CurrentShakeScale = FMath::FInterpTo(CurrentShakeScale, TargetShakeScale, DeltaTime, ShakeScaleInterpSpeed);
 		// Start the camera shake effect with the specified camera shake class and current shake scale
 		GetWorld()->GetFirstPlayerController()->PlayerCameraManager->StartCameraShake(MovementCameraShake,CurrentShakeScale);
+	}
+}
+
+void APlayerCharacter::OnStartFire(const FInputActionValue& Value) 
+{
+	if (CurrentWeapon != nullptr)
+	{
+		CurrentWeapon->OnStartFire();
+	}
+}
+
+void APlayerCharacter::OnEndFire(const FInputActionValue& Value)
+{
+	if (CurrentWeapon != nullptr)
+	{
+		CurrentWeapon->OnStopFire();
 	}
 }
 
