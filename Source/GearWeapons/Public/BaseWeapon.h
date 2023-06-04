@@ -31,7 +31,7 @@ struct FWeaponData
 	// Maximum number of rounds that one clip can hold
 	UPROPERTY(EditDefaultsOnly, Category = "Ammo")
 	int32 MaxClipAmmo;
-	UPROPERTY(EditDefaultsOnly, Category = "Ammo")
+	UPROPERTY(EditDefaultsOnly, Category = "WeaponStats")
 	float TimeBetweenShots;
 	// Default data
 	FWeaponData()
@@ -68,5 +68,5 @@ protected:
 	EWeaponState WeaponState;
 	int32 CurrentAmmoInClip;
 	virtual bool CanFire();
-	virtual void Fire() { };
+	virtual void Fire() { CurrentAmmoInClip--; };
 };
