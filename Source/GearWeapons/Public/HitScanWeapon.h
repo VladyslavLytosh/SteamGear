@@ -17,10 +17,16 @@ struct FHitScanWeaponData
 	float WeaponRange;
 	UPROPERTY(EditDefaultsOnly,Category="WeaponStats")
 	float ShotSpreadRadius;
+	UPROPERTY(EditDefaultsOnly,Category="WeaponStats")
+	float NumShots;
+	UPROPERTY(EditDefaultsOnly,Category="WeaponStats")
+	float DistanceSpreadMultiplier;
 	FHitScanWeaponData()
 	{
 		WeaponRange = 2500;
 		ShotSpreadRadius = 120.f;
+		NumShots = 1;
+		DistanceSpreadMultiplier = 0.5;
 	}
 };
 
@@ -32,4 +38,5 @@ protected:
 	virtual void Fire() override;
 	UPROPERTY(EditDefaultsOnly,Category= "Config|Weapon")
 	FHitScanWeaponData HitScanWeaponConfig;
+	FVector CalculateRandomOffset(const FVector& TargetLocation) const;
 };
