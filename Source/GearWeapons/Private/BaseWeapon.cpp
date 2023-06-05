@@ -7,7 +7,7 @@
 ABaseWeapon::ABaseWeapon()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 
 }
 
@@ -20,11 +20,14 @@ void ABaseWeapon::PostInitializeComponents()
 void ABaseWeapon::StartFire()
 {
 	WeaponState = EWeaponState::Firing;
-	if (!GetWorld()->GetTimerManager().IsTimerActive(FireRateTimer))
+        
+	const float CurrentTime = GetWorld()->GetTimeSeconds();
+	if (CurrentTime - LastFireTime >= WeaponConfig.TimeBetweenShots)
 	{
-		Fire(); 
-		GetWorld()->GetTimerManager().SetTimer(FireRateTimer, this, &ABaseWeapon::Fire, WeaponConfig.TimeBetweenShots, true);
+		Fire();
+		LastFireTime = CurrentTime;
 	}
+	GetWorldTimerManager().SetTimer(FireRateTimer, this, &ABaseWeapon::Fire, WeaponConfig.TimeBetweenShots, true);
 }
 
 void ABaseWeapon::StopFire()
@@ -46,14 +49,10 @@ void ABaseWeapon::OnEndEquipping()
 
 bool ABaseWeapon::CanFire()
 {
-	if (CurrentAmmoInClip > 0 &&
-		(WeaponState != EWeaponState::Reloading ||
-		WeaponState != EWeaponState::Equipping))
-	{
-		return true;
-	}
-	return false;
+	return CurrentAmmoInClip > 0 &&
+		(WeaponState != EWeaponState::Reloading || WeaponState != EWeaponState::Equipping);
 }
+
 
 void ABaseWeapon::Fire()
 {

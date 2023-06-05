@@ -33,6 +33,10 @@ struct FWeaponData
 	int32 MaxClipAmmo;
 	UPROPERTY(EditDefaultsOnly, Category = "WeaponStats")
 	float TimeBetweenShots;
+	UPROPERTY(EditDefaultsOnly, Category = "WeaponStats")
+	float MinRecoilNum;
+	UPROPERTY(EditDefaultsOnly, Category = "WeaponStats")
+	float MaxRecoilNum;
 	// Default data
 	FWeaponData()
 	{
@@ -41,6 +45,8 @@ struct FWeaponData
 		MaxAmmo = 100;
 		MaxClipAmmo = 10;
 		TimeBetweenShots = 0.5f;
+		MinRecoilNum = -1.f;
+		MaxRecoilNum = -1.5f;
 	}
 	
 };
@@ -70,4 +76,5 @@ protected:
 	virtual bool CanFire();
 	virtual void Fire();
 	FTimerHandle FireRateTimer;
+	float LastFireTime;
 };
