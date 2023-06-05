@@ -15,9 +15,12 @@ struct FHitScanWeaponData
 	GENERATED_BODY()
 	UPROPERTY(EditDefaultsOnly,Category="WeaponStats")
 	float WeaponRange;
+	UPROPERTY(EditDefaultsOnly,Category="WeaponStats")
+	float ShotSpreadRadius;
 	FHitScanWeaponData()
 	{
 		WeaponRange = 2500;
+		ShotSpreadRadius = 120.f;
 	}
 };
 

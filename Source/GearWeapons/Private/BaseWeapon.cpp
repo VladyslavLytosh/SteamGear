@@ -56,9 +56,17 @@ bool ABaseWeapon::CanFire()
 
 void ABaseWeapon::Fire()
 {
-#if !UE_BUILD_SHIPPING
-	UE_LOG(LogTemp,Display,TEXT("Current Ammo in Clip: %d"),CurrentAmmoInClip);
-#endif
+
+}
+
+void ABaseWeapon::ApplyRecoil() const
+{
+	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
+	if (PlayerController != nullptr)
+	{
+		const float RecoilPitch = FMath::FRandRange(WeaponConfig.MinRecoilNum, WeaponConfig.MaxRecoilNum);
+		PlayerController->AddPitchInput(RecoilPitch);
+	}
 }
 
 

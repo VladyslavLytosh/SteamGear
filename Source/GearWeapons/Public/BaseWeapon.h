@@ -77,4 +77,5 @@ protected:
 	virtual void Fire();
 	FTimerHandle FireRateTimer;
 	float LastFireTime;
+	void ApplyRecoil() const;
 };
