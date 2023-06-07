@@ -33,10 +33,14 @@ struct FWeaponData
 	int32 MaxClipAmmo;
 	UPROPERTY(EditDefaultsOnly, Category = "WeaponStats")
 	float TimeBetweenShots;
+	// When the player shoots with a weapon the camera goes up by a value in the range from MinRecoilNum to MaxRecoilNum 
 	UPROPERTY(EditDefaultsOnly, Category = "WeaponStats")
 	float MinRecoilNum;
 	UPROPERTY(EditDefaultsOnly, Category = "WeaponStats")
 	float MaxRecoilNum;
+	// Number of rounds expended per shot
+	UPROPERTY(EditDefaultsOnly, Category = "Ammo")
+	int32 RoundsPerShot;
 	// Default data
 	FWeaponData()
 	{
@@ -47,6 +51,7 @@ struct FWeaponData
 		TimeBetweenShots = 0.5f;
 		MinRecoilNum = -1.f;
 		MaxRecoilNum = -1.5f;
+		RoundsPerShot = 1;
 	}
 	
 };
@@ -69,13 +74,16 @@ public:
 	virtual void OnEndEquipping();
 	
 protected:
+	// Holds the configuration data for the weapon(can configure in blueprints)
 	UPROPERTY(EditDefaultsOnly,Category= "Config|Weapon")
 	FWeaponData WeaponConfig;
 	EWeaponState WeaponState;
 	int32 CurrentAmmoInClip;
-	virtual bool CanFire();
-	virtual void Fire();
 	FTimerHandle FireRateTimer;
+	// These functions define the internal logic of the weapon and can be overridden by derived classes.
+	virtual bool CanFire(); // Checks if the weapon can fire.
+	virtual void Fire(); // Performs the actual firing of the weapon 
+	// A timer handle to control the fire rate of the weapon.
 	float LastFireTime;
 	void ApplyRecoil() const;
 };

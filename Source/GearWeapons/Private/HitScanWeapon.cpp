@@ -6,13 +6,15 @@ void AHitScanWeapon::Fire()
 {
 	if (!CanFire())
 		return;
-
+	
+	// Iterate over the number of shots configured for the weapon
 	for (int32 ShotIndex = 0; ShotIndex < HitScanWeaponConfig.NumShots; ShotIndex++)
 	{
 		FHitResult HitResult;
-		const FVector LineStart = UGameplayStatics::GetPlayerCameraManager(this, 0)->GetCameraLocation();
-		FVector LineEnd = UGameplayStatics::GetPlayerCameraManager(this, 0)->GetCameraRotation().Vector() * HitScanWeaponConfig.WeaponRange + LineStart;
-
+		const FVector LineStart = GetLineStart();
+		FVector LineEnd = GetLineEnd();
+		
+		// Calculate a random offset to simulate shot spread
 		const FVector RandomOffset = CalculateRandomOffset(LineEnd);
 		LineEnd += RandomOffset;
 
@@ -28,17 +30,31 @@ void AHitScanWeapon::Fire()
 			// TODO: Object hit handling
 		}
 	}
-	CurrentAmmoInClip--;
+	CurrentAmmoInClip-= WeaponConfig.RoundsPerShot;
 	ApplyRecoil();
 }
 
 FVector AHitScanWeapon::CalculateRandomOffset(const FVector& TargetLocation) const
 {
+	// Calculate a random deviation within a circular area
 	const FVector2D RandomDeviation = FMath::RandPointInCircle(HitScanWeaponConfig.ShotSpreadRadius);
+	// Calculate the distance between the weapon and the target location
 	const float Distance = FVector::Dist(GetActorLocation(), TargetLocation);
 
-
-	const float DistanceMultiplier = FMath::Lerp(HitScanWeaponConfig.DistanceSpreadMultiplier, 1.f, Distance / HitScanWeaponConfig.WeaponRange);
-
+	// Calculate the distance multiplier based on the configured distance spread
+	const float DistanceMultiplier = FMath::Lerp(1.f, HitScanWeaponConfig.DistanceSpreadMultiplier, Distance / HitScanWeaponConfig.WeaponRange);
+	// Apply the random deviation with the distance multiplier
 	return FVector(0.f, RandomDeviation.X * DistanceMultiplier, RandomDeviation.Y * DistanceMultiplier);
+}
+
+FVector AHitScanWeapon::GetLineStart() const
+{
+	return UGameplayStatics::GetPlayerCameraManager(this, 0)->GetCameraLocation();
+}
+
+FVector AHitScanWeapon::GetLineEnd() const
+{
+	const FVector LineStart = GetLineStart();
+	const FVector LineDirection = UGameplayStatics::GetPlayerCameraManager(this, 0)->GetCameraRotation().Vector();
+	return LineDirection * HitScanWeaponConfig.WeaponRange + LineStart;
 }

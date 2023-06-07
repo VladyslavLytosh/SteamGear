@@ -20,13 +20,14 @@ void ABaseWeapon::PostInitializeComponents()
 void ABaseWeapon::StartFire()
 {
 	WeaponState = EWeaponState::Firing;
-        
+	// Checks if enough time has passed since the last shot, so we can make delay between single shots
 	const float CurrentTime = GetWorld()->GetTimeSeconds();
 	if (CurrentTime - LastFireTime >= WeaponConfig.TimeBetweenShots)
 	{
 		Fire();
 		LastFireTime = CurrentTime;
 	}
+	// Sets up a timer to repeatedly call the Fire() function based on the configured time between shots (worked if player hold fire button)
 	GetWorldTimerManager().SetTimer(FireRateTimer, this, &ABaseWeapon::Fire, WeaponConfig.TimeBetweenShots, true);
 }
 
@@ -39,31 +40,31 @@ void ABaseWeapon::StopFire()
 
 void ABaseWeapon::OnStartEquipping()
 {
-	
+	// TODO : Equipping
 }
 
 void ABaseWeapon::OnEndEquipping()
 {
-	
+	// TODO : Equipping
 }
 
 bool ABaseWeapon::CanFire()
 {
+	// Checks if the weapon can currently fire based on the ammo in the clip and the current weapon state
 	return CurrentAmmoInClip > 0 &&
 		(WeaponState != EWeaponState::Reloading || WeaponState != EWeaponState::Equipping);
 }
 
 
-void ABaseWeapon::Fire()
-{
+void ABaseWeapon::Fire() { }
 
-}
 
 void ABaseWeapon::ApplyRecoil() const
 {
 	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
 	if (PlayerController != nullptr)
 	{
+		// Generates a random recoil pitch within the specified range
 		const float RecoilPitch = FMath::FRandRange(WeaponConfig.MinRecoilNum, WeaponConfig.MaxRecoilNum);
 		PlayerController->AddPitchInput(RecoilPitch);
 	}
