@@ -25,12 +25,11 @@ struct FWeaponData
 	// If true, ammo in clip will be infinite (no reload needed)
 	UPROPERTY(EditDefaultsOnly, Category = "Ammo")
 	bool bInfiniteClip;
-	// Maximum number of ammo that character can hold for particular weapon
-	UPROPERTY(EditDefaultsOnly, Category = "Ammo")
-	int32 MaxAmmo;
 	// Maximum number of rounds that one clip can hold
 	UPROPERTY(EditDefaultsOnly, Category = "Ammo")
 	int32 MaxClipAmmo;
+	UPROPERTY(EditDefaultsOnly, Category = "Ammo")
+	int32 StartAmmo;
 	UPROPERTY(EditDefaultsOnly, Category = "WeaponStats")
 	float TimeBetweenShots;
 	// When the player shoots with a weapon the camera goes up by a value in the range from MinRecoilNum to MaxRecoilNum 
@@ -46,7 +45,6 @@ struct FWeaponData
 	{
 		bInfinitiveAmmo = false;
 		bInfiniteClip = false;
-		MaxAmmo = 100;
 		MaxClipAmmo = 10;
 		TimeBetweenShots = 0.5f;
 		MinRecoilNum = -1.f;
@@ -72,6 +70,8 @@ public:
 	virtual void StopFire();
 	virtual void OnStartEquipping();
 	virtual void OnEndEquipping();
+	virtual void OnStartReloading();
+	virtual void OnEndReloading();
 	
 protected:
 	// Holds the configuration data for the weapon(can configure in blueprints)
@@ -79,10 +79,12 @@ protected:
 	FWeaponData WeaponConfig;
 	EWeaponState WeaponState;
 	int32 CurrentAmmoInClip;
+	int32 CurrentAmmo;
 	FTimerHandle FireRateTimer;
 	// These functions define the internal logic of the weapon and can be overridden by derived classes.
 	virtual bool CanFire(); // Checks if the weapon can fire.
-	virtual void Fire(); // Performs the actual firing of the weapon 
+	virtual void Fire(); // Performs the actual firing of the weapon
+	virtual bool CanReload();
 	// A timer handle to control the fire rate of the weapon.
 	float LastFireTime;
 	void ApplyRecoil() const;

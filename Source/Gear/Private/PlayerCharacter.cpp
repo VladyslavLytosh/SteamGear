@@ -111,6 +111,7 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		EnhancedInputComponent->BindAction(SprintAction,ETriggerEvent::Completed,this,&APlayerCharacter::OnEndSprint);
 		EnhancedInputComponent->BindAction(FireAction,ETriggerEvent::Started,this,&APlayerCharacter::OnStartFire);
 		EnhancedInputComponent->BindAction(FireAction,ETriggerEvent::Completed,this,&APlayerCharacter::OnEndFire);
+		EnhancedInputComponent->BindAction(ReloadAction,ETriggerEvent::Started,this,&APlayerCharacter::Reload);
 	}
 
 }
@@ -208,6 +209,14 @@ void APlayerCharacter::OnEndFire(const FInputActionValue& Value)
 	if (CurrentWeapon != nullptr)
 	{
 		CurrentWeapon->StopFire();
+	}
+}
+
+void APlayerCharacter::Reload(const FInputActionValue& Value)
+{
+	if (CurrentWeapon != nullptr)
+	{
+		CurrentWeapon->OnStartReloading();
 	}
 }
 

@@ -57,6 +57,8 @@ private:
 	TObjectPtr<UInputAction> SprintAction;
 	UPROPERTY(EditAnywhere, Category = "Input")
 	TObjectPtr<UInputAction> FireAction;
+	UPROPERTY(EditAnywhere, Category = "Input")
+	TObjectPtr<UInputAction> ReloadAction;
 	
 	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly,Category = "Camera",meta = (AllowPrivateAccess = true))
 	TObjectPtr<class UCameraComponent> CameraComponent;
@@ -79,6 +81,8 @@ private:
 	
 	void OnStartFire(const FInputActionValue& Value);
 	void OnEndFire(const FInputActionValue& Value);
+
+	void Reload(const FInputActionValue& Value);
 
 	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category = "Sprint",meta = (AllowPrivateAccess = true))
 	float SprintSpeedModifier;
