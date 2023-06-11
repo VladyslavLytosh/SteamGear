@@ -12,6 +12,10 @@
 				"Engine"
 			]
 		},
+		{
+			"Name": "GearTest",
+			"Type": "Runtime"
+		},
 	],
 	"Plugins": [
 		{
