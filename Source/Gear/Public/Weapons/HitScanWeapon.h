@@ -35,7 +35,7 @@ struct FHitScanWeaponData
 };
 
 UCLASS()
-class GEARWEAPONS_API AHitScanWeapon : public ABaseWeapon
+class GEAR_API AHitScanWeapon : public ABaseWeapon
 {
 	GENERATED_BODY()
 protected:

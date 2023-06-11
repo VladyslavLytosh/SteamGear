@@ -1,4 +1,4 @@
-#include "HitScanWeapon.h"
+#include "Weapons/HitScanWeapon.h"
 #include "DrawDebugHelpers.h"
 #include "Kismet/GameplayStatics.h"
 

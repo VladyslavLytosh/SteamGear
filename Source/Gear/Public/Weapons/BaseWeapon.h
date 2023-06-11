@@ -55,7 +55,7 @@ struct FWeaponData
 };
 
 UCLASS(Abstract)
-class GEARWEAPONS_API ABaseWeapon : public AActor
+class GEAR_API ABaseWeapon : public AActor
 {
 	GENERATED_BODY()
 	

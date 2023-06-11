@@ -12,14 +12,6 @@
 				"Engine"
 			]
 		},
-		{
-			"Name": "GearWeapons",
-			"Type": "Runtime",
-			"LoadingPhase": "Default",
-			"AdditionalDependencies": [
-				"Engine"
-			]
-		},
 	],
 	"Plugins": [
 		{
