@@ -30,16 +30,16 @@ struct FWeaponData
 	int32 MaxClipAmmo;
 	UPROPERTY(EditDefaultsOnly, Category = "Ammo")
 	int32 StartAmmo;
-	UPROPERTY(EditDefaultsOnly, Category = "WeaponStats")
-	float TimeBetweenShots;
-	// When the player shoots with a weapon the camera goes up by a value in the range from MinRecoilNum to MaxRecoilNum 
-	UPROPERTY(EditDefaultsOnly, Category = "WeaponStats")
-	float MinRecoilNum;
-	UPROPERTY(EditDefaultsOnly, Category = "WeaponStats")
-	float MaxRecoilNum;
 	// Number of rounds expended per shot
 	UPROPERTY(EditDefaultsOnly, Category = "Ammo")
 	int32 RoundsPerShot;
+	UPROPERTY(EditDefaultsOnly, Category = "WeaponConfiguration")
+	float TimeBetweenShots;
+	// When the player shoots with a weapon the camera goes up by a value in the range from MinRecoilNum to MaxRecoilNum 
+	UPROPERTY(EditDefaultsOnly, Category = "WeaponConfiguration")
+	float MinRecoilNum;
+	UPROPERTY(EditDefaultsOnly, Category = "WeaponConfiguration")
+	float MaxRecoilNum;
 	// Default data
 	FWeaponData()
 	{
@@ -50,6 +50,7 @@ struct FWeaponData
 		MinRecoilNum = -1.f;
 		MaxRecoilNum = -1.5f;
 		RoundsPerShot = 1;
+		StartAmmo = 100;
 	}
 	
 };
@@ -77,6 +78,8 @@ protected:
 	// Holds the configuration data for the weapon(can configure in blueprints)
 	UPROPERTY(EditDefaultsOnly,Category= "Config|Weapon")
 	FWeaponData WeaponConfig;
+	UPROPERTY(VisibleAnywhere,Category = "Components")
+	TObjectPtr<UStaticMeshComponent> WeaponMesh;
 	EWeaponState WeaponState;
 	int32 CurrentAmmoInClip;
 	int32 CurrentAmmo;

@@ -14,16 +14,16 @@ struct FHitScanWeaponData
 {
 	GENERATED_BODY()
 	// The maximum range of the hitscan weapon
-	UPROPERTY(EditDefaultsOnly,Category="WeaponStats")
+	UPROPERTY(EditDefaultsOnly,Category="WeaponConfiguration")
 	float WeaponRange;
 	// The spread radius of shots fired by the hitscan weapon (During firing, a random point is selected from a circle with a radius of ShotSpreadRadius value)
-	UPROPERTY(EditDefaultsOnly,Category="WeaponStats")
+	UPROPERTY(EditDefaultsOnly,Category="WeaponConfiguration")
 	float ShotSpreadRadius;
 	// The number of shots fired by the hitscan weapon (Mostly needed to simulate a shotgun)
-	UPROPERTY(EditDefaultsOnly,Category="WeaponStats")
+	UPROPERTY(EditDefaultsOnly,Category="WeaponConfiguration")
 	float NumShots;
 	// The spread multiplier based on the distance to the target
-	UPROPERTY(EditDefaultsOnly,Category="WeaponStats")
+	UPROPERTY(EditDefaultsOnly,Category="WeaponConfiguration")
 	float DistanceSpreadMultiplier;
 	FHitScanWeaponData()
 	{

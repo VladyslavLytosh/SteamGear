@@ -4,6 +4,8 @@
 
 void AHitScanWeapon::Fire()
 {
+	Super::Fire();
+	
 	if (!CanFire())
 		return;
 	
@@ -30,7 +32,7 @@ void AHitScanWeapon::Fire()
 			// TODO: Object hit handling
 		}
 	}
-	CurrentAmmoInClip-= WeaponConfig.RoundsPerShot;
+	CurrentAmmoInClip -= WeaponConfig.RoundsPerShot;
 #if !UE_BUILD_SHIPPING
 	UE_LOG(LogTemp,Display,TEXT("Current ammo in clip %d"),CurrentAmmoInClip);
 #endif

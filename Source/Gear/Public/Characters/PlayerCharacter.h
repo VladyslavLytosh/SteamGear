@@ -60,7 +60,7 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Input")
 	TObjectPtr<UInputAction> ReloadAction;
 	
-	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly,Category = "Camera",meta = (AllowPrivateAccess = true))
+	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly,Category = "Components",meta = (AllowPrivateAccess = true))
 	TObjectPtr<class UCameraComponent> CameraComponent;
 
 	void Move(const FInputActionValue& Value);
