@@ -9,14 +9,12 @@
 /**
  * 
  */
-UCLASS()
+UCLASS(Blueprintable)
 class STATEMACHINE_API UStateBase : public UObject
 {
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(BlueprintReadOnly,EditDefaultsOnly)
-	bool bCanTickState = false;
 	UPROPERTY(BlueprintReadOnly,EditDefaultsOnly)
 	bool bCanRepeat = false;
 	UPROPERTY(BlueprintReadOnly,EditDefaultsOnly)

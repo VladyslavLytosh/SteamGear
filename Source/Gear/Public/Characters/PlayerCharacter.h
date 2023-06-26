@@ -45,8 +45,6 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly,Category = "Components",meta = (AllowPrivateAccess = true))
 	TObjectPtr<class UCameraComponent> CameraComponent;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TObjectPtr<class UStateManagerComponent> StateManagerComponent;
 private:
 	// Pointers to various input actions
 	UPROPERTY(EditAnywhere, Category = "Input")
@@ -89,7 +87,7 @@ private:
 	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category = "Sprint",meta = (AllowPrivateAccess = true))
 	float SprintSpeedModifier;
 	float MaxWalkSpeed;
-
+	
 	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category = "Sprint",meta = (AllowPrivateAccess = true))
 	float MaxStamina;
 	float CurrentStamina;
