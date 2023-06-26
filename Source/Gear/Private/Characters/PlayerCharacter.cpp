@@ -23,6 +23,9 @@ APlayerCharacter::APlayerCharacter()
 	// Configure camera component settings for first-person perspective
 	CameraComponent->bUsePawnControlRotation = true;
 	CameraComponent->SetRelativeLocation(FVector(-10.f,0.f,60.f));
+
+	// Attach PlayerMesh to the Camera
+	GetMesh()->SetupAttachment(CameraComponent);
 	
 	// Initialize player stamina-related and sprint variables
 	MaxStamina = 100;
@@ -68,6 +71,7 @@ void APlayerCharacter::BeginPlay()
 		}
 	}
 	CurrentWeapon = GetWorld()->SpawnActor<ABaseWeapon>(WeaponInventory[0], GetActorLocation(), GetActorRotation());
+	CurrentWeapon->AttachToComponent(GetMesh(),FAttachmentTransformRules::SnapToTargetNotIncludingScale,"Weapon_socket");
 
 }
 
@@ -81,9 +85,7 @@ void APlayerCharacter::Tick(float DeltaTime)
 	{
 		return;
 	}
-	
 
-	
 	// Decrease the player's stamina and recover it based on the player state and current stamina number
 	DecreaseStamina(DeltaTime);
 	RecoverStamina(DeltaTime);	
@@ -111,7 +113,7 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		EnhancedInputComponent->BindAction(SprintAction,ETriggerEvent::Completed,this,&APlayerCharacter::OnEndSprint);
 		EnhancedInputComponent->BindAction(FireAction,ETriggerEvent::Started,this,&APlayerCharacter::OnStartFire);
 		EnhancedInputComponent->BindAction(FireAction,ETriggerEvent::Completed,this,&APlayerCharacter::OnEndFire);
-		EnhancedInputComponent->BindAction(ReloadAction,ETriggerEvent::Started,this,&APlayerCharacter::Reload);
+		EnhancedInputComponent->BindAction(ReloadAction,ETriggerEvent::Started,this,&APlayerCharacter::OnStartReload);
 	}
 
 }
@@ -212,12 +214,20 @@ void APlayerCharacter::OnEndFire(const FInputActionValue& Value)
 	}
 }
 
-void APlayerCharacter::Reload(const FInputActionValue& Value)
+void APlayerCharacter::OnStartReload(const FInputActionValue& Value)
 {
-	if (CurrentWeapon != nullptr)
+	if (CurrentWeapon != nullptr && CurrentWeapon->CanReload())
 	{
-		CurrentWeapon->OnStartReloading();
+		CurrentWeapon->SetWeaponState(EWeaponState::Reloading);
+		const float AnimationTime =  GetMesh()->GetAnimInstance()->Montage_Play(CurrentWeapon->GetWeaponConfig().HandReloadAnimation);
+		CurrentWeapon->GetWeaponMesh()->GetAnimInstance()->Montage_Play(CurrentWeapon->GetWeaponConfig().WeaponReloadAnimation);
+		GetWorldTimerManager().SetTimer(ReloadTimer, this, &APlayerCharacter::OnEndReload,AnimationTime, false);
 	}
+}
+
+void APlayerCharacter::OnEndReload() const
+{
+	CurrentWeapon->Reload();
 }
 
 void APlayerCharacter::DecreaseStamina(float DeltaTime)

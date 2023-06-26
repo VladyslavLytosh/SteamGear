@@ -33,13 +33,17 @@ struct FWeaponData
 	// Number of rounds expended per shot
 	UPROPERTY(EditDefaultsOnly, Category = "Ammo")
 	int32 RoundsPerShot;
-	UPROPERTY(EditDefaultsOnly, Category = "WeaponConfiguration")
+	UPROPERTY(EditDefaultsOnly, Category = "Weapon Configuration")
 	float TimeBetweenShots;
 	// When the player shoots with a weapon the camera goes up by a value in the range from MinRecoilNum to MaxRecoilNum 
-	UPROPERTY(EditDefaultsOnly, Category = "WeaponConfiguration")
+	UPROPERTY(EditDefaultsOnly, Category = "Weapon Configuration")
 	float MinRecoilNum;
-	UPROPERTY(EditDefaultsOnly, Category = "WeaponConfiguration")
+	UPROPERTY(EditDefaultsOnly, Category = "Weapon Configuration")
 	float MaxRecoilNum;
+	UPROPERTY(EditDefaultsOnly, Category = "Animation")
+	TObjectPtr<UAnimMontage> WeaponReloadAnimation;
+	UPROPERTY(EditDefaultsOnly, Category = "Animation")
+	TObjectPtr<UAnimMontage> HandReloadAnimation;
 	// Default data
 	FWeaponData()
 	{
@@ -71,24 +75,34 @@ public:
 	virtual void StopFire();
 	virtual void OnStartEquipping();
 	virtual void OnEndEquipping();
-	virtual void OnStartReloading();
-	virtual void OnEndReloading();
-	
+	virtual void Reload();
+	virtual bool CanReload();
+
 protected:
 	// Holds the configuration data for the weapon(can configure in blueprints)
 	UPROPERTY(EditDefaultsOnly,Category= "Config|Weapon")
 	FWeaponData WeaponConfig;
-	UPROPERTY(VisibleAnywhere,Category = "Components")
-	TObjectPtr<UStaticMeshComponent> WeaponMesh;
 	EWeaponState WeaponState;
 	int32 CurrentAmmoInClip;
 	int32 CurrentAmmo;
+
+public:
+	EWeaponState GetWeaponState() const;
+	void SetWeaponState(const EWeaponState WeaponState);
+
+protected:
 	FTimerHandle FireRateTimer;
 	// These functions define the internal logic of the weapon and can be overridden by derived classes.
 	virtual bool CanFire(); // Checks if the weapon can fire.
 	virtual void Fire(); // Performs the actual firing of the weapon
-	virtual bool CanReload();
 	// A timer handle to control the fire rate of the weapon.
 	float LastFireTime;
 	void ApplyRecoil() const;
+	UPROPERTY(EditDefaultsOnly,Category = "Components")
+	TObjectPtr<USkeletalMeshComponent> WeaponMesh;
+
+public:
+	FWeaponData GetWeaponConfig() const;
+
+	TObjectPtr<USkeletalMeshComponent> GetWeaponMesh() const;
 };

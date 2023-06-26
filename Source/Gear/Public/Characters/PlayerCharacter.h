@@ -82,7 +82,7 @@ private:
 	void OnStartFire(const FInputActionValue& Value);
 	void OnEndFire(const FInputActionValue& Value);
 
-	void Reload(const FInputActionValue& Value);
+	void OnStartReload(const FInputActionValue& Value);
 
 	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category = "Sprint",meta = (AllowPrivateAccess = true))
 	float SprintSpeedModifier;
@@ -108,4 +108,8 @@ private:
 	UPROPERTY(EditDefaultsOnly)
 	TArray<TSubclassOf<class ABaseWeapon>> WeaponInventory;
 	TObjectPtr<ABaseWeapon> CurrentWeapon;
+	
+	FTimerHandle ReloadTimer;
+	void OnEndReload() const;
+
 };

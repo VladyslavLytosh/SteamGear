@@ -8,7 +8,9 @@ ABaseWeapon::ABaseWeapon()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
-	
+
+	WeaponMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Weapon Mesh"));
+
 }
 
 void ABaseWeapon::PostInitializeComponents()
@@ -49,12 +51,8 @@ void ABaseWeapon::OnEndEquipping()
 	// TODO : Equipping
 }
 
-void ABaseWeapon::OnStartReloading()
+void ABaseWeapon::Reload()
 {
-	if (!CanReload())
-		return;
-	
-	WeaponState = EWeaponState::Reloading;
 	const int32 AmmoNeeded = WeaponConfig.MaxClipAmmo - CurrentAmmoInClip;
 
 	if (CurrentAmmo < AmmoNeeded)
@@ -71,12 +69,18 @@ void ABaseWeapon::OnStartReloading()
 	UE_LOG(LogTemp,Display,TEXT("Current ammo in clip %d"),CurrentAmmoInClip);
 	UE_LOG(LogTemp,Display,TEXT("Current ammo  %d"),CurrentAmmo);
 #endif
-
+	WeaponState = EWeaponState::Idle;
 }
 
-void ABaseWeapon::OnEndReloading()
+
+EWeaponState ABaseWeapon::GetWeaponState() const
 {
-	WeaponState = EWeaponState::Idle;
+	return WeaponState;
+}
+
+void ABaseWeapon::SetWeaponState(const EWeaponState _WeaponState)
+{
+	this->WeaponState = _WeaponState;
 }
 
 bool ABaseWeapon::CanFire()
@@ -91,7 +95,7 @@ void ABaseWeapon::Fire() { }
 
 bool ABaseWeapon::CanReload()
 {
-	return CurrentAmmoInClip < WeaponConfig.MaxClipAmmo;
+	return CurrentAmmoInClip < WeaponConfig.MaxClipAmmo && WeaponState != EWeaponState::Reloading;
 }
 
 
@@ -104,6 +108,16 @@ void ABaseWeapon::ApplyRecoil() const
 		const float RecoilPitch = FMath::FRandRange(WeaponConfig.MinRecoilNum, WeaponConfig.MaxRecoilNum);
 		PlayerController->AddPitchInput(RecoilPitch);
 	}
+}
+
+FWeaponData ABaseWeapon::GetWeaponConfig() const
+{
+	return WeaponConfig;
+}
+
+TObjectPtr<USkeletalMeshComponent> ABaseWeapon::GetWeaponMesh() const
+{
+	return WeaponMesh;
 }
 
 
