@@ -14,8 +14,7 @@ void AProjectileWeapon::Fire()
 {
 	Super::Fire();
 	
-	if (!CanFire())
-		return;
+
 
 	const FVector MuzzleLocation = Muzzle->GetComponentLocation();
 	const FRotator MuzzleRotation = Muzzle->GetComponentRotation();

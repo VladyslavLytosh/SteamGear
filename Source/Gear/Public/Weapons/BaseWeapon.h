@@ -44,6 +44,10 @@ struct FWeaponData
 	TObjectPtr<UAnimMontage> WeaponReloadAnimation;
 	UPROPERTY(EditDefaultsOnly, Category = "Animation")
 	TObjectPtr<UAnimMontage> HandReloadAnimation;
+	UPROPERTY(EditDefaultsOnly, Category = "Animation")
+	TObjectPtr<UAnimMontage> WeaponFireAnimation;
+	UPROPERTY(EditDefaultsOnly, Category = "Animation")
+	TObjectPtr<UAnimMontage> HandFireAnimation;
 	// Default data
 	FWeaponData()
 	{
@@ -77,7 +81,7 @@ public:
 	virtual void OnEndEquipping();
 	virtual void Reload();
 	virtual bool CanReload();
-
+	virtual bool CanFire(); // Checks if the weapon can fire.
 protected:
 	// Holds the configuration data for the weapon(can configure in blueprints)
 	UPROPERTY(EditDefaultsOnly,Category= "Config|Weapon")
@@ -93,7 +97,6 @@ public:
 protected:
 	FTimerHandle FireRateTimer;
 	// These functions define the internal logic of the weapon and can be overridden by derived classes.
-	virtual bool CanFire(); // Checks if the weapon can fire.
 	virtual void Fire(); // Performs the actual firing of the weapon
 	// A timer handle to control the fire rate of the weapon.
 	float LastFireTime;

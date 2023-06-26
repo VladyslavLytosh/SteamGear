@@ -85,13 +85,15 @@ void ABaseWeapon::SetWeaponState(const EWeaponState _WeaponState)
 
 bool ABaseWeapon::CanFire()
 {
-	// Checks if the weapon can currently fire based on the ammo in the clip and the current weapon state
+	// Checks if the weapon can currently fire based фффon the ammo in the clip and the current weapon state
 	return CurrentAmmoInClip > 0 &&
 		(WeaponState != EWeaponState::Reloading || WeaponState != EWeaponState::Equipping);
 }
 
 
-void ABaseWeapon::Fire() { }
+void ABaseWeapon::Fire()
+{
+}
 
 bool ABaseWeapon::CanReload()
 {

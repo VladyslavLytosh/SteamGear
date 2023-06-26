@@ -95,7 +95,7 @@ void APlayerCharacter::Tick(float DeltaTime)
 	{
 		PlayerState = EPlayerState::Idle;
 	}
-	UpdateCameraShake(DeltaTime);
+	//UpdateCameraShake(DeltaTime);
 	
 }
 
@@ -200,8 +200,10 @@ void APlayerCharacter::UpdateCameraShake(float DeltaTime)
 
 void APlayerCharacter::OnStartFire(const FInputActionValue& Value) 
 {
-	if (CurrentWeapon != nullptr)
+	if (CurrentWeapon != nullptr && CurrentWeapon->CanFire())
 	{
+		GetMesh()->GetAnimInstance()->Montage_Play(CurrentWeapon->GetWeaponConfig().HandFireAnimation);
+		CurrentWeapon->GetWeaponMesh()->GetAnimInstance()->Montage_Play(CurrentWeapon->GetWeaponConfig().WeaponFireAnimation);
 		CurrentWeapon->StartFire();
 	}
 }
