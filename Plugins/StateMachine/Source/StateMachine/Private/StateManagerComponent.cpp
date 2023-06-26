@@ -21,7 +21,7 @@ void UStateManagerComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// ...
+	InitializesStates();
 	
 }
 
@@ -30,8 +30,22 @@ void UStateManagerComponent::BeginPlay()
 void UStateManagerComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	// ...
+	if (bCanTickState)
+	{
+		CurrentState->TickState();
+	}
+	if (bDebug)
+	{
+		if(CurrentState)
+			GEngine->AddOnScreenDebugMessage(INDEX_NONE,0.f, FColor::Green, this->GetOwner()->GetName() + "'s current state: " + CurrentState->StateDisplayName.GetPlainNameString());
+		if (StateHistory.Num() > 0)
+		{
+			for (int32 i = 0; i < StateHistory.Num(); i++)
+			{
+				GEngine->AddOnScreenDebugMessage(INDEX_NONE,0.f, FColor::Purple, this->GetOwner()->GetName() + "'s past state " + FString::FromInt(i) + " " + StateHistory[i].GetName());
+			}
+		}
+	}
 }
 
 void UStateManagerComponent::SwitchStateByKey(FString StateKey)
@@ -71,6 +85,7 @@ void UStateManagerComponent::SwitchStateByKey(FString StateKey)
 				CurrentState = NewState;
 			}
 		}
+		
 		if (CurrentState)
 		{
 			CurrentState->OnEnterState(GetOwner());
@@ -85,10 +100,55 @@ void UStateManagerComponent::SwitchStateByKey(FString StateKey)
 
 void UStateManagerComponent::SwitchState(TObjectPtr<UStateBase> NewState)
 {
+	if (NewState->IsValidLowLevel())
+	{
+		if (!CurrentState)
+		{
+			CurrentState = NewState;
+		}
+		else
+		{
+			if (CurrentState.GetClass() == NewState.GetClass() && CurrentState == false)
+			{
+				if (bDebug)
+				{
+					GEngine->AddOnScreenDebugMessage(INDEX_NONE,3.f,FColor::Red, this->GetOwner()->GetName() + "'s state switch failed. " + CurrentState->StateDisplayName.GetPlainNameString() + " is not repeatable!", true);
+				}
+			}
+			else
+			{
+				bCanTickState = false;
+
+				CurrentState->OnExitState();
+
+				if (StateHistory.Num() < StateHistoryLength)
+				{
+					StateHistory.Add(CurrentState);
+				}
+				else
+				{
+					StateHistory.RemoveAt(0);
+					StateHistory.Add(CurrentState);
+				}
+				CurrentState = NewState;
+			}
+		}
+		
+		if (CurrentState)
+		{
+			CurrentState->OnEnterState(GetOwner());
+			bCanTickState = true;
+		}
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(INDEX_NONE,3.f,FColor::Red, this->GetOwner()->GetName() + "'s state switch failed. " "Invalid state", true);
+	}
 }
 
 void UStateManagerComponent::InitStateManager()
 {
+	SwitchStateByKey(InitialState);
 }
 
 void UStateManagerComponent::InitializesStates()
