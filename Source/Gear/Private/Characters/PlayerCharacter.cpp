@@ -7,6 +7,7 @@
 #include "Camera/CameraComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
+#include "StateManagerComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
 
@@ -15,6 +16,8 @@ APlayerCharacter::APlayerCharacter()
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+	
+	StateManagerComponent = CreateDefaultSubobject<UStateManagerComponent>(TEXT("State Manager"));
 	
 	// We create camera from c++, because we need quick access to the camera component
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("Player Camera"));
@@ -59,6 +62,7 @@ void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+	StateManagerComponent->InitStateManager();
 	// Add default Input Mapping Context
 	if (const TObjectPtr<APlayerController> PlayerController = Cast<APlayerController>(GetController()))
 	{

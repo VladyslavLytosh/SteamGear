@@ -42,7 +42,11 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
-
+	
+	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly,Category = "Components",meta = (AllowPrivateAccess = true))
+	TObjectPtr<class UCameraComponent> CameraComponent;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<class UStateManagerComponent> StateManagerComponent;
 private:
 	// Pointers to various input actions
 	UPROPERTY(EditAnywhere, Category = "Input")
@@ -60,8 +64,6 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Input")
 	TObjectPtr<UInputAction> ReloadAction;
 	
-	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly,Category = "Components",meta = (AllowPrivateAccess = true))
-	TObjectPtr<class UCameraComponent> CameraComponent;
 
 	void Move(const FInputActionValue& Value);
 	void Look(const FInputActionValue& Value);
