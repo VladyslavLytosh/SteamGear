@@ -10,7 +10,7 @@ public class Gear : ModuleRules
 	
 		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore" });
 
-		PrivateDependencyModuleNames.AddRange(new string[] { "EnhancedInput", "GearTest" });
+		PrivateDependencyModuleNames.AddRange(new string[] { "EnhancedInput", "GearTest", "StateMachine" });
 
 		// Uncomment if you are using Slate UI
 		// PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });
