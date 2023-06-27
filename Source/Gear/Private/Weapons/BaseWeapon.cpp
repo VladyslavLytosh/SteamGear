@@ -3,6 +3,8 @@
 
 #include "Weapons/BaseWeapon.h"
 
+#include "GameFramework/Character.h"
+
 // Sets default values
 ABaseWeapon::ABaseWeapon()
 {
@@ -69,6 +71,23 @@ void ABaseWeapon::Reload()
 	UE_LOG(LogTemp,Display,TEXT("Current ammo in clip %d"),CurrentAmmoInClip);
 	UE_LOG(LogTemp,Display,TEXT("Current ammo  %d"),CurrentAmmo);
 #endif
+}
+
+void ABaseWeapon::OnStartReload()
+{
+	if (CanReload())
+	{
+		const TObjectPtr<USkeletalMeshComponent> HandsMesh = Cast<ACharacter>(GetOwner())->GetMesh();
+		const float AnimationTime = HandsMesh->GetAnimInstance()->Montage_Play(WeaponConfig.HandReloadAnimation);
+		GetWeaponMesh()->GetAnimInstance()->Montage_Play(WeaponConfig.WeaponReloadAnimation);
+		GetWorldTimerManager().SetTimer(ReloadTimer, this, &ABaseWeapon::OnEndReload,AnimationTime, false);
+		SetWeaponState(EWeaponState::Reloading);
+	}
+}
+
+void ABaseWeapon::OnEndReload()
+{
+	Reload();
 	WeaponState = EWeaponState::Idle;
 }
 

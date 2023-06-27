@@ -82,7 +82,7 @@ private:
 	void OnStartFire(const FInputActionValue& Value);
 	void OnEndFire(const FInputActionValue& Value);
 
-	void OnStartReload(const FInputActionValue& Value);
+	void Reload(const FInputActionValue& Value);
 
 	UPROPERTY(EditAnywhere,BlueprintReadOnly,Category = "Sprint",meta = (AllowPrivateAccess = true))
 	float SprintSpeedModifier;

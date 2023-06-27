@@ -72,6 +72,7 @@ void APlayerCharacter::BeginPlay()
 	}
 	CurrentWeapon = GetWorld()->SpawnActor<ABaseWeapon>(WeaponInventory[0], GetActorLocation(), GetActorRotation());
 	CurrentWeapon->AttachToComponent(GetMesh(),FAttachmentTransformRules::SnapToTargetNotIncludingScale,"Weapon_socket");
+	CurrentWeapon->SetOwner(this);
 
 }
 
@@ -113,7 +114,7 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		EnhancedInputComponent->BindAction(SprintAction,ETriggerEvent::Completed,this,&APlayerCharacter::OnEndSprint);
 		EnhancedInputComponent->BindAction(FireAction,ETriggerEvent::Started,this,&APlayerCharacter::OnStartFire);
 		EnhancedInputComponent->BindAction(FireAction,ETriggerEvent::Completed,this,&APlayerCharacter::OnEndFire);
-		EnhancedInputComponent->BindAction(ReloadAction,ETriggerEvent::Started,this,&APlayerCharacter::OnStartReload);
+		EnhancedInputComponent->BindAction(ReloadAction,ETriggerEvent::Started,this,&APlayerCharacter::Reload);
 	}
 
 }
@@ -216,20 +217,12 @@ void APlayerCharacter::OnEndFire(const FInputActionValue& Value)
 	}
 }
 
-void APlayerCharacter::OnStartReload(const FInputActionValue& Value)
+void APlayerCharacter::Reload(const FInputActionValue& Value)
 {
-	if (CurrentWeapon != nullptr && CurrentWeapon->CanReload())
+	if (CurrentWeapon)
 	{
-		CurrentWeapon->SetWeaponState(EWeaponState::Reloading);
-		const float AnimationTime =  GetMesh()->GetAnimInstance()->Montage_Play(CurrentWeapon->GetWeaponConfig().HandReloadAnimation);
-		CurrentWeapon->GetWeaponMesh()->GetAnimInstance()->Montage_Play(CurrentWeapon->GetWeaponConfig().WeaponReloadAnimation);
-		GetWorldTimerManager().SetTimer(ReloadTimer, this, &APlayerCharacter::OnEndReload,AnimationTime, false);
+		CurrentWeapon->OnStartReload();
 	}
-}
-
-void APlayerCharacter::OnEndReload() const
-{
-	CurrentWeapon->Reload();
 }
 
 void APlayerCharacter::DecreaseStamina(float DeltaTime)

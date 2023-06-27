@@ -80,6 +80,8 @@ public:
 	virtual void OnStartEquipping();
 	virtual void OnEndEquipping();
 	virtual void Reload();
+	virtual void OnStartReload();
+	virtual void OnEndReload();
 	virtual bool CanReload();
 	virtual bool CanFire(); // Checks if the weapon can fire.
 protected:
@@ -103,6 +105,7 @@ protected:
 	void ApplyRecoil() const;
 	UPROPERTY(EditDefaultsOnly,Category = "Components")
 	TObjectPtr<USkeletalMeshComponent> WeaponMesh;
+	FTimerHandle ReloadTimer;
 
 public:
 	FWeaponData GetWeaponConfig() const;
