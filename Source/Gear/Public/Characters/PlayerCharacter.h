@@ -110,6 +110,5 @@ private:
 	TObjectPtr<ABaseWeapon> CurrentWeapon;
 	
 	FTimerHandle ReloadTimer;
-	void OnEndReload() const;
 
 };

@@ -4,8 +4,11 @@
 
 void AHitScanWeapon::Fire()
 {
+	if (!CanFire())
+	{
+		return;
+	}
 	Super::Fire();
-	
 	// Iterate over the number of shots configured for the weapon
 	for (int32 ShotIndex = 0; ShotIndex < HitScanWeaponConfig.NumShots; ShotIndex++)
 	{

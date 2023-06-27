@@ -9,7 +9,7 @@
 ABaseWeapon::ABaseWeapon()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = false;
+	PrimaryActorTick.bCanEverTick = true;
 
 	WeaponMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Weapon Mesh"));
 
@@ -24,7 +24,6 @@ void ABaseWeapon::PostInitializeComponents()
 
 void ABaseWeapon::StartFire()
 {
-	WeaponState = EWeaponState::Firing;
 	// Checks if enough time has passed since the last shot, so we can make delay between single shots
 	const float CurrentTime = GetWorld()->GetTimeSeconds();
 	if (CurrentTime - LastFireTime >= WeaponConfig.TimeBetweenShots)
@@ -38,7 +37,8 @@ void ABaseWeapon::StartFire()
 
 void ABaseWeapon::StopFire()
 {
-	WeaponState = EWeaponState::Idle;
+	if (WeaponState != EWeaponState::Reloading && WeaponState != EWeaponState::Equipping)
+		WeaponState = EWeaponState::Idle;
 	GetWorldTimerManager().ClearTimer(FireRateTimer);	
 	
 }
@@ -71,17 +71,18 @@ void ABaseWeapon::Reload()
 	UE_LOG(LogTemp,Display,TEXT("Current ammo in clip %d"),CurrentAmmoInClip);
 	UE_LOG(LogTemp,Display,TEXT("Current ammo  %d"),CurrentAmmo);
 #endif
+	
 }
 
 void ABaseWeapon::OnStartReload()
 {
 	if (CanReload())
 	{
-		const TObjectPtr<USkeletalMeshComponent> HandsMesh = Cast<ACharacter>(GetOwner())->GetMesh();
-		const float AnimationTime = HandsMesh->GetAnimInstance()->Montage_Play(WeaponConfig.HandReloadAnimation);
-		GetWeaponMesh()->GetAnimInstance()->Montage_Play(WeaponConfig.WeaponReloadAnimation);
+		WeaponState = EWeaponState::Reloading;
+		const TObjectPtr<USkeletalMeshComponent> HandMesh = Cast<ACharacter>(GetOwner())->GetMesh();
+		const float AnimationTime = HandMesh->GetAnimInstance()->Montage_Play(WeaponConfig.HandReloadAnimation);
+		WeaponMesh->GetAnimInstance()->Montage_Play(WeaponConfig.WeaponReloadAnimation);
 		GetWorldTimerManager().SetTimer(ReloadTimer, this, &ABaseWeapon::OnEndReload,AnimationTime, false);
-		SetWeaponState(EWeaponState::Reloading);
 	}
 }
 
@@ -91,32 +92,31 @@ void ABaseWeapon::OnEndReload()
 	WeaponState = EWeaponState::Idle;
 }
 
-
-EWeaponState ABaseWeapon::GetWeaponState() const
-{
-	return WeaponState;
-}
-
-void ABaseWeapon::SetWeaponState(const EWeaponState _WeaponState)
-{
-	this->WeaponState = _WeaponState;
-}
-
 bool ABaseWeapon::CanFire()
 {
-	// Checks if the weapon can currently fire based фффon the ammo in the clip and the current weapon state
+	// Checks if the weapon can currently fire based on the ammo in the clip and the current weapon state
 	return CurrentAmmoInClip > 0 &&
-		(WeaponState != EWeaponState::Reloading || WeaponState != EWeaponState::Equipping);
+		(WeaponState != EWeaponState::Reloading && WeaponState != EWeaponState::Equipping);
 }
 
+void ABaseWeapon::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+	UE_LOG(LogTemp,Warning,TEXT("%hhd"),WeaponState);
+}
 
 void ABaseWeapon::Fire()
 {
+	WeaponState = EWeaponState::Firing;
+	const TObjectPtr<USkeletalMeshComponent> HandMesh = Cast<ACharacter>(GetOwner())->GetMesh();
+	HandMesh->GetAnimInstance()->Montage_Play(WeaponConfig.HandFireAnimation);
+	WeaponMesh->GetAnimInstance()->Montage_Play(WeaponConfig.WeaponFireAnimation);
 }
 
 bool ABaseWeapon::CanReload()
 {
-	return CurrentAmmoInClip < WeaponConfig.MaxClipAmmo && WeaponState != EWeaponState::Reloading;
+	return CurrentAmmoInClip < WeaponConfig.MaxClipAmmo && CurrentAmmo > 0 && (WeaponState != EWeaponState::Reloading
+		&& WeaponState != EWeaponState::Firing && WeaponState != EWeaponState::Equipping);
 }
 
 
@@ -130,16 +130,3 @@ void ABaseWeapon::ApplyRecoil() const
 		PlayerController->AddPitchInput(RecoilPitch);
 	}
 }
-
-FWeaponData ABaseWeapon::GetWeaponConfig() const
-{
-	return WeaponConfig;
-}
-
-TObjectPtr<USkeletalMeshComponent> ABaseWeapon::GetWeaponMesh() const
-{
-	return WeaponMesh;
-}
-
-
-

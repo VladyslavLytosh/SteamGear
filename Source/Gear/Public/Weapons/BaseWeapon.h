@@ -84,6 +84,7 @@ public:
 	virtual void OnEndReload();
 	virtual bool CanReload();
 	virtual bool CanFire(); // Checks if the weapon can fire.
+	virtual void Tick(float DeltaSeconds) override;
 protected:
 	// Holds the configuration data for the weapon(can configure in blueprints)
 	UPROPERTY(EditDefaultsOnly,Category= "Config|Weapon")
@@ -91,12 +92,6 @@ protected:
 	EWeaponState WeaponState;
 	int32 CurrentAmmoInClip;
 	int32 CurrentAmmo;
-
-public:
-	EWeaponState GetWeaponState() const;
-	void SetWeaponState(const EWeaponState WeaponState);
-
-protected:
 	FTimerHandle FireRateTimer;
 	// These functions define the internal logic of the weapon and can be overridden by derived classes.
 	virtual void Fire(); // Performs the actual firing of the weapon
@@ -106,9 +101,4 @@ protected:
 	UPROPERTY(EditDefaultsOnly,Category = "Components")
 	TObjectPtr<USkeletalMeshComponent> WeaponMesh;
 	FTimerHandle ReloadTimer;
-
-public:
-	FWeaponData GetWeaponConfig() const;
-
-	TObjectPtr<USkeletalMeshComponent> GetWeaponMesh() const;
 };

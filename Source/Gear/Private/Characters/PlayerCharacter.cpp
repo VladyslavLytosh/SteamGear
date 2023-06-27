@@ -201,10 +201,8 @@ void APlayerCharacter::UpdateCameraShake(float DeltaTime)
 
 void APlayerCharacter::OnStartFire(const FInputActionValue& Value) 
 {
-	if (CurrentWeapon != nullptr && CurrentWeapon->CanFire())
+	if (CurrentWeapon)
 	{
-		GetMesh()->GetAnimInstance()->Montage_Play(CurrentWeapon->GetWeaponConfig().HandFireAnimation);
-		CurrentWeapon->GetWeaponMesh()->GetAnimInstance()->Montage_Play(CurrentWeapon->GetWeaponConfig().WeaponFireAnimation);
 		CurrentWeapon->StartFire();
 	}
 }
