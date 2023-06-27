@@ -26,20 +26,15 @@ struct FWeaponData
 	UPROPERTY(EditDefaultsOnly, Category = "Ammo")
 	bool bInfiniteClip;
 	// Maximum number of rounds that one clip can hold
-	UPROPERTY(EditDefaultsOnly, Category = "Ammo")
+	UPROPERTY(EditDefaultsOnly, Category = "Ammo", meta = (ClampMin = 1, UIMin = 1))
 	int32 MaxClipAmmo;
-	UPROPERTY(EditDefaultsOnly, Category = "Ammo")
+	UPROPERTY(EditDefaultsOnly, Category = "Ammo", meta = (ClampMin = 1, UIMin = 1))
 	int32 StartAmmo;
 	// Number of rounds expended per shot
 	UPROPERTY(EditDefaultsOnly, Category = "Ammo")
 	int32 RoundsPerShot;
-	UPROPERTY(EditDefaultsOnly, Category = "Weapon Configuration")
+	UPROPERTY(EditDefaultsOnly, Category = "Weapon Configuration",meta = (ClampMin = 0, UIMin = 0))
 	float TimeBetweenShots;
-	// When the player shoots with a weapon the camera goes up by a value in the range from MinRecoilNum to MaxRecoilNum 
-	UPROPERTY(EditDefaultsOnly, Category = "Weapon Configuration")
-	float MinRecoilNum;
-	UPROPERTY(EditDefaultsOnly, Category = "Weapon Configuration")
-	float MaxRecoilNum;
 	UPROPERTY(EditDefaultsOnly, Category = "Animation")
 	TObjectPtr<UAnimMontage> WeaponReloadAnimation;
 	UPROPERTY(EditDefaultsOnly, Category = "Animation")
@@ -55,8 +50,6 @@ struct FWeaponData
 		bInfiniteClip = false;
 		MaxClipAmmo = 10;
 		TimeBetweenShots = 0.5f;
-		MinRecoilNum = -1.f;
-		MaxRecoilNum = -1.5f;
 		RoundsPerShot = 1;
 		StartAmmo = 100;
 	}
@@ -96,7 +89,6 @@ protected:
 	virtual void Fire(); // Performs the actual firing of the weapon
 	// A timer handle to control the fire rate of the weapon.
 	float LastFireTime;
-	void ApplyRecoil() const;
 	UPROPERTY(EditDefaultsOnly,Category = "Components")
 	TObjectPtr<USkeletalMeshComponent> WeaponMesh;
 	FTimerHandle ReloadTimer;

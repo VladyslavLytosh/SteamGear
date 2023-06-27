@@ -113,15 +113,3 @@ bool ABaseWeapon::CanReload()
 	return CurrentAmmoInClip < WeaponConfig.MaxClipAmmo && CurrentAmmo > 0 && (WeaponState != EWeaponState::Reloading
 		&& WeaponState != EWeaponState::Firing && WeaponState != EWeaponState::Equipping);
 }
-
-
-void ABaseWeapon::ApplyRecoil() const
-{
-	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
-	if (PlayerController != nullptr)
-	{
-		// Generates a random recoil pitch within the specified range
-		const float RecoilPitch = FMath::FRandRange(WeaponConfig.MinRecoilNum, WeaponConfig.MaxRecoilNum);
-		PlayerController->AddPitchInput(RecoilPitch);
-	}
-}

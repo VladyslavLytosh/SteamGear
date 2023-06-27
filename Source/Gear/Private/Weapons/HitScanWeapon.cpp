@@ -36,7 +36,6 @@ void AHitScanWeapon::Fire()
 #if !UE_BUILD_SHIPPING
 	UE_LOG(LogTemp,Display,TEXT("Current ammo in clip %d"),CurrentAmmoInClip);
 #endif
-	ApplyRecoil();
 }
 
 FVector AHitScanWeapon::CalculateRandomOffset(const FVector& TargetLocation) const
