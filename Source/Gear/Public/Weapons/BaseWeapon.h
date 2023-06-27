@@ -84,7 +84,6 @@ public:
 	virtual void OnEndReload();
 	virtual bool CanReload();
 	virtual bool CanFire(); // Checks if the weapon can fire.
-	virtual void Tick(float DeltaSeconds) override;
 protected:
 	// Holds the configuration data for the weapon(can configure in blueprints)
 	UPROPERTY(EditDefaultsOnly,Category= "Config|Weapon")

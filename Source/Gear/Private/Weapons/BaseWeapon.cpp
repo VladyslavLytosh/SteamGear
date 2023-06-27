@@ -9,7 +9,7 @@
 ABaseWeapon::ABaseWeapon()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 
 	WeaponMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Weapon Mesh"));
 
@@ -99,11 +99,6 @@ bool ABaseWeapon::CanFire()
 		(WeaponState != EWeaponState::Reloading && WeaponState != EWeaponState::Equipping);
 }
 
-void ABaseWeapon::Tick(float DeltaSeconds)
-{
-	Super::Tick(DeltaSeconds);
-	UE_LOG(LogTemp,Warning,TEXT("%hhd"),WeaponState);
-}
 
 void ABaseWeapon::Fire()
 {

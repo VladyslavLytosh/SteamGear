@@ -96,7 +96,7 @@ void APlayerCharacter::Tick(float DeltaTime)
 	{
 		PlayerState = EPlayerState::Idle;
 	}
-	//UpdateCameraShake(DeltaTime);
+	UpdateCameraShake(DeltaTime);
 	
 }
 
