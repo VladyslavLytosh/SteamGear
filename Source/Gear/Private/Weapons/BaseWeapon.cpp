@@ -101,6 +101,7 @@ void ABaseWeapon::Fire()
 		return;
 	HandMesh->GetAnimInstance()->Montage_Play(WeaponConfig.HandFireAnimation);
 	WeaponMesh->GetAnimInstance()->Montage_Play(WeaponConfig.WeaponFireAnimation);
+	GetWorld()->GetFirstPlayerController()->PlayerCameraManager->StartCameraShake(WeaponConfig.FireCameraShake);
 }
 
 bool ABaseWeapon::CanReload()

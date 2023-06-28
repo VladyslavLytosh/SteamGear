@@ -45,6 +45,8 @@ struct FWeaponData
 	TObjectPtr<UAnimMontage> WeaponFireAnimation;
 	UPROPERTY(EditDefaultsOnly, Category = "Animation")
 	TObjectPtr<UAnimMontage> HandFireAnimation;
+	UPROPERTY(EditDefaultsOnly, Category = "CameraShake")
+	TSubclassOf<UCameraShakeBase> FireCameraShake;
 	// Default data
 	FWeaponData()
 	{
