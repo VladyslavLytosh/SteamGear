@@ -35,6 +35,8 @@ struct FWeaponData
 	int32 RoundsPerShot;
 	UPROPERTY(EditDefaultsOnly, Category = "Weapon Configuration",meta = (ClampMin = 0, UIMin = 0))
 	float TimeBetweenShots;
+	UPROPERTY(EditDefaultsOnly, Category = "Weapon Configuration",meta = (ClampMin = 1, ClampMax = 2, UIMin = 1,  UIMax = 2))
+	float ReloadTime;
 	UPROPERTY(EditDefaultsOnly, Category = "Animation")
 	TObjectPtr<UAnimMontage> WeaponReloadAnimation;
 	UPROPERTY(EditDefaultsOnly, Category = "Animation")
@@ -52,6 +54,7 @@ struct FWeaponData
 		TimeBetweenShots = 0.5f;
 		RoundsPerShot = 1;
 		StartAmmo = 100;
+		ReloadTime = 1;
 	}
 	
 };
@@ -71,12 +74,7 @@ public:
 	virtual void StartFire();
 	virtual void StopFire();
 	virtual void OnStartEquipping();
-	virtual void OnEndEquipping();
-	virtual void Reload();
 	virtual void OnStartReload();
-	virtual void OnEndReload();
-	virtual bool CanReload();
-	virtual bool CanFire(); // Checks if the weapon can fire.
 protected:
 	// Holds the configuration data for the weapon(can configure in blueprints)
 	UPROPERTY(EditDefaultsOnly,Category= "Config|Weapon")
@@ -92,4 +90,12 @@ protected:
 	UPROPERTY(EditDefaultsOnly,Category = "Components")
 	TObjectPtr<USkeletalMeshComponent> WeaponMesh;
 	FTimerHandle ReloadTimer;
+	virtual bool CanFire(); // Checks if the weapon can fire.
+	void ResetAmmo();
+	const ACharacter* GetOwningCharacter() const;
+	void StartReloadingAnimation();
+	virtual bool CanReload();
+	virtual void OnEndReload();
+	virtual void Reload();
+	virtual void OnEndEquipping();
 };

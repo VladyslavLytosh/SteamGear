@@ -89,10 +89,10 @@ void APlayerCharacter::Tick(float DeltaTime)
 
 	// Decrease the player's stamina and recover it based on the player state and current stamina number
 	DecreaseStamina(DeltaTime);
-	RecoverStamina(DeltaTime);	
-	
-	constexpr float VelocityThreshold = 0.01f;
-	if (GetVelocity().SizeSquared() <= FMath::Square(VelocityThreshold))
+	RecoverStamina(DeltaTime);
+
+	if (constexpr float VelocityThreshold = 0.01f;
+		GetVelocity().SizeSquared() <= FMath::Square(VelocityThreshold))
 	{
 		PlayerState = EPlayerState::Idle;
 	}
@@ -148,8 +148,8 @@ void APlayerCharacter::Look(const FInputActionValue& Value)
 
 void APlayerCharacter::OnSprintUpdate(const FInputActionValue& Value)
 {
-	constexpr float VelocityThreshold = 0.01f;
-	if (CurrentStamina <= 0 || GetVelocity().SizeSquared() <= FMath::Square(VelocityThreshold) || GetCharacterMovement()->IsFalling())
+	if (constexpr float VelocityThreshold = 0.01f;
+		CurrentStamina <= 0 || GetVelocity().SizeSquared() <= FMath::Square(VelocityThreshold) || GetCharacterMovement()->IsFalling())
 	{
 		OnEndSprint(Value);
 		return;
